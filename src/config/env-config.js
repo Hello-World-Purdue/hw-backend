@@ -21,7 +21,7 @@ const serverRuntimeConfig = {
   GC_CLIENT_EMAIL: env.GC_CLIENT_EMAIL || "my@clientemail.com",
   GC_PRIVATE_KEY: env.GC_PRIVATE_KEY || "myprivatekey",
   GC_PROJECT_ID: env.GC_PROJECT_ID || "myprojectid",
-  ORG_NAME: env.ORG_NAME || "Purdue Hackers",
+  ORG_NAME: env.ORG_NAME || "Hello World",
   SECRET: env.SECRET || "my-secret",
   SENDGRID_KEY: env.SENDGRID_KEY || "mysendgridkey",
   VAPID_PRIVATE: env.VAPID_PRIVATE || "my vapid private key",

@@ -97,8 +97,8 @@ export default class Server {
     });
 
     // Graceful shutdown
-    process.on("SIGTERM", async () => {
-      logger.info("Graceful shut down initiated");
+    const gracefulShutdown = async () => {
+      console.log("Graceful shut down initiated");
       await this.mongoose.disconnect();
       await new Promise((resolve, reject) =>
         this.httpServer.close((err) =>
@@ -106,7 +106,9 @@ export default class Server {
         )
       );
       process.exit(0);
-    });
+    };
+    process.on("SIGTERM", gracefulShutdown);
+    process.on("SIGINT", gracefulShutdown);
     return this;
   }
 
