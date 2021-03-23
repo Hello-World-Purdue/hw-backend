@@ -1,22 +1,21 @@
 import errorHandler from "errorhandler";
 import express from "express";
 import compression from "compression";
-import cors from 'cors';
+import cors from "cors";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import morgan from 'morgan';
+import morgan from "morgan";
 import mongoose from "mongoose";
 import { createLogger } from "winston";
-import { createServer as createHttpServer, Server as HTTPServer } from 'http';
+import { createServer as createHttpServer, Server as HTTPServer } from "http";
 // import app from "./app";
 import { any } from "bluebird";
-import CONFIG from './config';
+import CONFIG from "./config";
 import logger from "./util/logger";
 import { AddressInfo } from "net";
 
 const { NODE_ENV, MONGODB_URI } = CONFIG;
-
 
 // /**
 //  * Error Handler. Provides full stack
@@ -24,7 +23,6 @@ const { NODE_ENV, MONGODB_URI } = CONFIG;
 // if (process.env.NODE_ENV === "development") {
 //     app.use(errorHandler());
 // }
-
 
 // /**
 //  * Start Express server.
@@ -41,100 +39,98 @@ const { NODE_ENV, MONGODB_URI } = CONFIG;
 // export default server;
 
 export default class Server {
-    public static async createServerInstance(): Promise<Server> {
-        const server = new Server();
-        await server.setupDB();
-        return server;
+  public static async createServerInstance(): Promise<Server> {
+    const server = new Server();
+    await server.setupDB();
+    return server;
+  }
+
+  public app: express.Application;
+  public mongoose: typeof mongoose;
+  public httpServer: HTTPServer;
+
+  private constructor() {
+    this.app = express();
+    this.setup();
+  }
+
+  public async initFrontend(): Promise<void> {
+    //Setup fronted if any
+  }
+
+  private setupMiddleware(): void {
+    if (CONFIG.NODE_ENV !== "test") {
+      const logFormat = CONFIG.NODE_ENV !== "production" ? "dev" : "tiny";
+      this.app.use(morgan(logFormat));
     }
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(cookieParser());
+    this.app.use(cors());
+    this.app.use(compression());
+  }
 
-    public app: express.Application;
-    public mongoose: typeof mongoose;
-    public httpServer: HTTPServer
-
-
-
-    private constructor() {
-        this.app = express();
-        this.setup();
+  private async setupDB() {
+    try {
+      this.mongoose = await mongoose.connect(MONGODB_URI, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
+        useUnifiedTopology: true,
+      });
+      this.mongoose.Promise = Promise;
+      logger.info("Connected to mongo:", MONGODB_URI);
+      return this.mongoose;
+    } catch (error) {
+      logger.error("Error connecting to mongo:", error);
+      // throw error;
     }
+  }
 
-    public async initFrontend(): Promise<void> {
-        //Setup fronted if any
+  public async start() {
+    await this.initFrontend();
+
+    this.httpServer.listen(CONFIG.PORT, () => {
+      CONFIG.PORT = (this.httpServer.address() as AddressInfo).port;
+      console.log("CONFIG:", CONFIG);
+      logger.info(`Listening on port: ${CONFIG.PORT}`);
+    });
+
+    // Graceful shutdown
+    process.on("SIGTERM", async () => {
+      logger.info("Graceful shut down initiated");
+      await this.mongoose.disconnect();
+      await new Promise((resolve, reject) =>
+        this.httpServer.close((err) =>
+          err ? reject(err) : resolve("No Error")
+        )
+      );
+      process.exit(0);
+    });
+    return this;
+  }
+
+  public async stop() {
+    if (this.mongoose) {
+      await this.mongoose.disconnect();
     }
-
-    private setupMiddleware(): void {
-        if (CONFIG.NODE_ENV !== 'test') {
-			const logFormat = CONFIG.NODE_ENV !== 'production' ? 'dev' : 'tiny';
-			this.app.use(
-				morgan(logFormat)
-			);
-		}
-        this.app.use(express.json());
-		this.app.use(express.urlencoded({ extended: true }));
-		this.app.use(cookieParser());
-		this.app.use(cors());
-		this.app.use(compression());
+    if (this.httpServer) {
+      await new Promise((resolve, reject) =>
+        this.httpServer.close((err) =>
+          err ? reject(err) : resolve("No Error")
+        )
+      );
     }
+    return this;
+  }
 
-    private async setupDB() {
-        try {
-			this.mongoose = await mongoose.connect(MONGODB_URI, {
-				useNewUrlParser: true,
-				useCreateIndex: true,
-				useFindAndModify: false,
-                useUnifiedTopology: true
-			});
-			this.mongoose.Promise = Promise;
-			logger.info("Connected to mongo:", MONGODB_URI);
-			return this.mongoose;
-		} catch (error) {
-			logger.error("Error connecting to mongo:", error);
-			// throw error;
-		}
-    }
+  private setup(): void {
+    this.setupMiddleware();
 
-    public async start() {
-		await this.initFrontend();
+    // Any unhandled errors will be caught in this middleware
+    // this.app.use(globalError);
+    // this.setupSwagger();
 
-		this.httpServer.listen(CONFIG.PORT, () => {
-			CONFIG.PORT = (this.httpServer.address() as AddressInfo).port;
-			logger.info("CONFIG:", CONFIG);
-			logger.info(`Listening on port: ${CONFIG.PORT}`);
-		});
-
-		// Graceful shutdown
-		process.on("SIGTERM", async () => {
-			logger.info("Graceful shut down initiated")
-			await this.mongoose.disconnect();
-			await new Promise((resolve, reject) =>
-				this.httpServer.close(err => (err ? reject(err) : resolve("No Error")))
-			);
-			process.exit(0);
-		});
-		return this;
-	}
-
-    public async stop() {
-		if (this.mongoose) {
-			await this.mongoose.disconnect();
-		}
-		if (this.httpServer) {
-			await new Promise((resolve, reject) =>
-				this.httpServer.close(err => (err ? reject(err) : resolve("No Error")))
-			);
-		}
-		return this;
-	}
-
-    private setup(): void {
-		this.setupMiddleware();
-
-		// Any unhandled errors will be caught in this middleware
-		// this.app.use(globalError);
-		// this.setupSwagger();
-
-		this.httpServer = createHttpServer(this.app);
-	}
+    this.httpServer = createHttpServer(this.app);
+  }
 }
-
-
