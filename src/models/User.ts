@@ -1,107 +1,93 @@
-import bcrypt from "bcrypt-nodejs";
-import crypto from "crypto";
-import mongoose from "mongoose";
+import * as bcrypt from "bcrypt";
+import { Document, Schema, model } from "mongoose";
+import { IsEmail, Matches, IsNotEmpty } from "class-validator";
+import { Exclude, Expose } from "class-transformer";
+// import { IApplicationModel } from "./application";
+import { Role } from "../enums/user.enums";
 
-export type UserDocument = mongoose.Document & {
+@Exclude()
+export class UserDto {
+  @IsNotEmpty({ message: "Please provide your first and last name" })
+  @Matches(/([a-zA-Z']+ )+[a-zA-Z']+$/, {
+    message: "Please provide your first and last name",
+  })
+  @Expose()
+  name: string;
+
+  @IsNotEmpty({ message: "Please provide a valid email address" })
+  @IsEmail({}, { message: "Please provide a valid email address" })
+  @Expose()
   email: string;
+
+  @Exclude()
   password: string;
-  passwordResetToken: string;
-  passwordResetExpires: Date;
 
-  facebook: string;
-  tokens: AuthToken[];
-
-  profile: {
-    name: string;
-    gender: string;
-    location: string;
-    website: string;
-    picture: string;
-  };
-
-  comparePassword: comparePasswordFunction;
-  gravatar: (size: number) => string;
-};
-
-type comparePasswordFunction = (
-  candidatePassword: string,
-  cb: (err: any, isMatch: any) => void
-) => void;
-
-export interface AuthToken {
-  accessToken: string;
-  kind: string;
+  @Exclude()
+  resetPasswordToken?: string;
+  async comparePassword(password: string): Promise<boolean> {
+    return password && (await bcrypt.compare(password, this.password));
+  }
 }
 
-const userSchema = new mongoose.Schema<UserDocument>(
+export interface IUserModel extends Document {
+  name: string;
+
+  email: string;
+
+  password: string;
+  role: Role;
+  //   application: IApplicationModel;
+  checkedin: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const schema = new Schema(
   {
-    email: { type: String, unique: true },
-    password: String,
-    passwordResetToken: String,
-    passwordResetExpires: Date,
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    password: {
+      type: String,
+      select: false,
+      required: true,
+    },
+    role: { type: String, enum: Object.keys(Role), default: Role.USER },
+    checkedin: { type: Boolean, default: false },
+    resetPasswordToken: { type: String, select: false },
 
-    facebook: String,
-    twitter: String,
-    google: String,
-    tokens: Array,
-
-    profile: {
-      name: String,
-      gender: String,
-      location: String,
-      website: String,
-      picture: String,
+    application: {
+      type: Schema.Types.ObjectId,
+      ref: "Application",
     },
   },
   { timestamps: true }
 );
 
-/**
- * Password hash middleware.
- */
-userSchema.pre("save", function save(next) {
-  const user = this as UserDocument;
-  if (!user.isModified("password")) {
-    return next();
-  }
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) {
-      return next(err);
-    }
-    bcrypt.hash(user.password, salt, undefined, (err: mongoose.Error, hash) => {
-      if (err) {
-        return next(err);
-      }
+schema.pre("save", async function (next) {
+  const user = this as IUserModel;
+  if (user.isModified("password") || user.isNew) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(user.password, salt);
       user.password = hash;
-      next();
-    });
-  });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  next();
 });
 
-const comparePassword: comparePasswordFunction = function (
-  candidatePassword,
-  cb
-) {
-  bcrypt.compare(
-    candidatePassword,
-    this.password,
-    (err: mongoose.Error, isMatch: boolean) => {
-      cb(err, isMatch);
-    }
-  );
+schema.methods.comparePassword = async function (password: string) {
+  const user = this as IUserModel;
+  return password && (await bcrypt.compare(password, user.password));
 };
 
-userSchema.methods.comparePassword = comparePassword;
-
-/**
- * Helper method for getting user's gravatar.
- */
-userSchema.methods.gravatar = function (size: number = 200) {
-  if (!this.email) {
-    return `https://gravatar.com/avatar/?s=${size}&d=retro`;
-  }
-  const md5 = crypto.createHash("md5").update(this.email).digest("hex");
-  return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
-};
-
-export const User = mongoose.model<UserDocument>("User", userSchema);
+export const User = model<IUserModel>("User", schema, "users");
