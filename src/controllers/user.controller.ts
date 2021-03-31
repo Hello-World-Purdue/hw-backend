@@ -2,7 +2,7 @@
 // import crypto from "crypto";
 // import nodemailer from "nodemailer";
 // import passport from "passport";
-// import { User, UserDocument, AuthToken } from "../models/User";
+// import { User } from "../models/User";
 // import { Request, Response, NextFunction } from "express";
 // import { IVerifyOptions } from "passport-local";
 // import { WriteError } from "mongodb";
@@ -10,18 +10,18 @@
 // import "../config/passport";
 // import { CallbackError, NativeError } from "mongoose";
 
-// /**
-//  * Login page.
-//  * @route GET /login
-//  */
-// export const getLogin = (req: Request, res: Response): void => {
-//   if (req.user) {
-//     return res.redirect("/");
-//   }
-//   res.render("account/login", {
-//     title: "Login",
-//   });
-// };
+// // /**
+// //  * Login page.
+// //  * @route GET /login
+// //  */
+// // export const getLogin = (req: Request, res: Response): void => {
+// //   if (req.user) {
+// //     return res.redirect("/");
+// //   }
+// //   res.render("account/login", {
+// //     title: "Login",
+// //   });
+// // };
 
 // /**
 //  * Sign in using email and password.
@@ -75,18 +75,18 @@
 //   res.redirect("/");
 // };
 
-// /**
-//  * Signup page.
-//  * @route GET /signup
-//  */
-// export const getSignup = (req: Request, res: Response): void => {
-//   if (req.user) {
-//     return res.redirect("/");
-//   }
-//   res.render("account/signup", {
-//     title: "Create Account",
-//   });
-// };
+// // /**
+// //  * Signup page.
+// //  * @route GET /signup
+// //  */
+// // export const getSignup = (req: Request, res: Response): void => {
+// //   if (req.user) {
+// //     return res.redirect("/");
+// //   }
+// //   res.render("account/signup", {
+// //     title: "Create Account",
+// //   });
+// // };
 
 // /**
 //  * Create a new local account.
@@ -145,15 +145,15 @@
 //   );
 // };
 
-// /**
-//  * Profile page.
-//  * @route GET /account
-//  */
-// export const getAccount = (req: Request, res: Response): void => {
-//   res.render("account/profile", {
-//     title: "Account Management",
-//   });
-// };
+// // /**
+// //  * Profile page.
+// //  * @route GET /account
+// //  */
+// // export const getAccount = (req: Request, res: Response): void => {
+// //   res.render("account/profile", {
+// //     title: "Account Management",
+// //   });
+// // };
 
 // /**
 //  * Update profile information.
@@ -408,18 +408,18 @@
 //   );
 // };
 
-// /**
-//  * Forgot Password page.
-//  * @route GET /forgot
-//  */
-// export const getForgot = (req: Request, res: Response): void => {
-//   if (req.isAuthenticated()) {
-//     return res.redirect("/");
-//   }
-//   res.render("account/forgot", {
-//     title: "Forgot Password",
-//   });
-// };
+// // /**
+// //  * Forgot Password page.
+// //  * @route GET /forgot
+// //  */
+// // export const getForgot = (req: Request, res: Response): void => {
+// //   if (req.isAuthenticated()) {
+// //     return res.redirect("/");
+// //   }
+// //   res.render("account/forgot", {
+// //     title: "Forgot Password",
+// //   });
+// // };
 
 // /**
 //  * Create a random token, then the send user an email with a reset link.

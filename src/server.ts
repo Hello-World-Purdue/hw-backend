@@ -113,7 +113,7 @@ export default class Server {
     return this;
   }
 
-  public async stop() {
+  public async stop(): Promise<any> {
     if (this.mongoose) {
       await this.mongoose.disconnect();
     }

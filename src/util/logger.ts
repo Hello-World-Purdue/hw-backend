@@ -1,4 +1,4 @@
-import winston, { format } from "winston";
+import winston from "winston";
 
 const myformat: winston.Logform.Format = winston.format.combine(
   winston.format.colorize(),

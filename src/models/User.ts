@@ -2,7 +2,7 @@ import * as bcrypt from "bcrypt";
 import { Document, Schema, model } from "mongoose";
 import { IsEmail, Matches, IsNotEmpty } from "class-validator";
 import { Exclude, Expose } from "class-transformer";
-// import { IApplicationModel } from "./application";
+import { IApplicationModel } from "./application";
 import { Role } from "../enums/user.enums";
 
 @Exclude()
@@ -29,14 +29,9 @@ export class UserDto {
   }
 }
 
-export interface IUserModel extends Document {
-  name: string;
-
-  email: string;
-
-  password: string;
+export interface IUserModel extends Document, UserDto {
   role: Role;
-  //   application: IApplicationModel;
+  application: IApplicationModel;
   checkedin: boolean;
   createdAt: Date;
   updatedAt: Date;
