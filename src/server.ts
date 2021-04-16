@@ -80,7 +80,7 @@ export default class Server {
         useUnifiedTopology: true,
       });
       this.mongoose.Promise = Promise;
-      logger.info("Connected to mongo:", MONGODB_URI);
+      logger.info("Connected to MongoDB");
       return this.mongoose;
     } catch (error) {
       logger.error("Error connecting to mongo:", error);
@@ -88,7 +88,7 @@ export default class Server {
     }
   }
 
-  public async start() {
+  public async start(): Promise<any> {
     await this.initFrontend();
 
     this.httpServer.listen(CONFIG.PORT, () => {
