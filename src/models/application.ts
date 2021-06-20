@@ -89,19 +89,31 @@ export interface IApplicationModel extends ApplicationDto, Document {
 
 const schema = new Schema(
   {
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     gender: { type: String, required: true, enum: Object.values(Gender) },
     ethnicity: { type: String, required: true, enum: ethnicities },
-    classYear: { type: String, required: true, enum: Object.values(ClassYear) },
+    classYear: {
+      type: String,
+      required: true,
+      enum: Object.values(ClassYear),
+    },
     graduationYear: { type: Number, required: true },
     major: { type: String, required: true, enum: Object.values(Major) },
-    referral: { type: String, required: true, enum: Object.values(Referral) },
+    referral: {
+      type: String,
+      required: true,
+      enum: Object.values(Referral),
+    },
     hackathons: { type: Number, default: 0 },
-    shirtSize: { type: String, required: true, enum: Object.values(ShirtSize) },
+    shirtSize: {
+      type: String,
+      required: true,
+      enum: Object.values(ShirtSize),
+    },
     dietaryRestrictions: { type: String, default: "" },
     website: { type: String, default: "" },
     answer1: { type: String, required: true },

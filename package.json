@@ -25,7 +25,9 @@
         "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\""
     },
     "dependencies": {
+        "@types/jsonwebtoken": "^8.5.1",
         "@types/mongodb": "3.6.5",
+        "@types/passport-jwt": "^3.0.5",
         "async": "3.2.0",
         "bcrypt": "^5.0.1",
         "bcrypt-nodejs": "0.0.3",
@@ -44,7 +46,8 @@
         "express-session": "1.17.1",
         "express-validator": "6.9.2",
         "fbgraph": "1.4.4",
-        "lodash": "4.17.20",
+        "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.21",
         "lusca": "1.6.1",
         "mongoose": "5.11.15",
         "morgan": "^1.10.0",
@@ -52,6 +55,7 @@
         "nodemailer": "6.4.17",
         "passport": "0.4.1",
         "passport-facebook": "3.0.0",
+        "passport-jwt": "^4.0.0",
         "passport-local": "1.0.0",
         "reflect-metadata": "^0.1.13",
         "winston": "3.3.3"

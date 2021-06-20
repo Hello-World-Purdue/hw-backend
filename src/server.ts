@@ -15,29 +15,11 @@ import { createServer as createHttpServer, Server as HTTPServer } from "http";
 import CONFIG from "./config";
 import logger from "./util/logger";
 import { AddressInfo } from "net";
+import userRouter from "./controllers/user.controller";
+import authRouter from "./controllers/auth.controller";
+import { standardErrorHandler } from "./middleware/errorHandler";
 
 const { NODE_ENV, MONGODB_URI } = CONFIG;
-
-// /**
-//  * Error Handler. Provides full stack
-//  */
-// if (process.env.NODE_ENV === "development") {
-//     app.use(errorHandler());
-// }
-
-// /**
-//  * Start Express server.
-//  */
-// const server = app.listen(app.get("port"), () => {
-//     console.log(
-//         "  App is running at http://localhost:%d in %s mode",
-//         app.get("port"),
-//         app.get("env")
-//     );
-//     console.log("  Press CTRL-C to stop\n");
-// });
-
-// export default server;
 
 export default class Server {
   public static async createServerInstance(): Promise<Server> {
@@ -69,6 +51,15 @@ export default class Server {
     this.app.use(cookieParser());
     this.app.use(cors());
     this.app.use(compression());
+  }
+
+  private setupApiRouters(): void {
+    this.app.use("/api/users/", userRouter);
+    this.app.use("/api/auth/", authRouter);
+  }
+
+  private setupErrorHandler(): void {
+    this.app.use(standardErrorHandler);
   }
 
   private async setupDB() {
@@ -130,9 +121,8 @@ export default class Server {
   private setup(): void {
     this.setupMiddleware();
 
-    // Any unhandled errors will be caught in this middleware
-    // this.app.use(globalError);
-    // this.setupSwagger();
+    this.setupApiRouters();
+    this.setupErrorHandler();
 
     this.httpServer = createHttpServer(this.app);
   }
