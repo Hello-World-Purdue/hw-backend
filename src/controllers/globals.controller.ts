@@ -11,13 +11,17 @@ import { Role } from "../enums/user.enums";
 const router = Router();
 
 const getGlobals = async (req: Request, res: Response, next: NextFunction) => {
-  const globals: IGlobalsModel = await Globals.findOneAndUpdate(
+  const globals: IGlobalsModel = await getGlobalValues();
+  res.status(200).json({ globals });
+};
+
+export const getGlobalValues = async (): Promise<IGlobalsModel> => {
+  return await Globals.findOneAndUpdate(
     {},
     {},
     //upsert will update the object, setDefaultsOnInsert will apply the defaults and new will return the updated object instead of the old one
     { upsert: true, setDefaultsOnInsert: true, new: true }
   ).exec();
-  res.status(200).json({ globals });
 };
 
 const updateApplicationsStatus = async (
