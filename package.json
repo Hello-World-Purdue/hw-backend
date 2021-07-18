@@ -27,9 +27,14 @@
         "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\""
     },
     "dependencies": {
+<<<<<<< HEAD
         "@sendgrid/mail": "^7.4.5",
+=======
+        "@google-cloud/storage": "^5.8.5",
+>>>>>>> 924209a (added the storage service)
         "@types/jsonwebtoken": "^8.5.1",
         "@types/mongodb": "3.6.5",
+        "@types/multer": "^1.4.7",
         "@types/next": "^9.0.0",
         "@types/passport-jwt": "^3.0.5",
         "@types/react": "^17.0.11",
