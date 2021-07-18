@@ -1,4 +1,4 @@
-import { User } from "../models/User";
+import { IUserModel, User } from "../models/User";
 import { Request, Response, NextFunction, Router } from "express";
 import { Application } from "../models/application";
 import { isValidObjectId } from "mongoose";
@@ -8,12 +8,14 @@ import {
   logInChecker,
 } from "../middleware/authentication";
 import { Role } from "../enums/user.enums";
-import { hasPermission } from "../util";
+import { hasPermission, userMatches } from "../util";
 import {
   BadRequestException,
   NotFoundException,
   UnauthorizedException,
 } from "../util/exceptions";
+import { getGlobalValues } from "./globals.controller";
+import { ApplicationsStatus } from "../enums/globals.enums";
 
 const router = Router();
 
@@ -144,8 +146,27 @@ const updateUserById = async (
   res.status(200).send({ user: result });
 };
 
-const apply = async (req: Request, res: Response) => {
-  return;
+const apply = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id))
+    return next(new BadRequestException("Invalid user ID"));
+  const user: IUserModel = await User.findById(id).exec();
+  if (!user) return next(new BadRequestException("User not found"));
+  const currUser: any = req.user;
+  if (!userMatches(currUser, id))
+    return next(
+      new BadRequestException("You are not authorized to edit this application")
+    );
+  const globals = await getGlobalValues();
+  const closed =
+    currUser.role === Role.ADMIN
+      ? false
+      : globals.applicationsStatus === ApplicationsStatus.CLOSED;
+
+  if (closed)
+    next(new UnauthorizedException("Sorry, applications are closed!"));
+
+  //TODO: file upload
 };
 
 router.use(logInChecker);
