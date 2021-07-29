@@ -36,3 +36,5 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.lock
+
+helloworld2021key.json
