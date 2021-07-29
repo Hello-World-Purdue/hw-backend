@@ -27,6 +27,7 @@
         "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\""
     },
     "dependencies": {
+        "@sendgrid/mail": "^7.4.5",
         "@types/jsonwebtoken": "^8.5.1",
         "@types/mongodb": "3.6.5",
         "@types/next": "^9.0.0",
