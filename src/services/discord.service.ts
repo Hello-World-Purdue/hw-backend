@@ -13,6 +13,6 @@ const hook = new Discord.WebhookClient(
 );
 
 // Send a message using the webhook
-export const sendAnnouncement = (announcement: string): any => {
+export const sendAnnouncement = (announcement: string): void => {
   hook.send(announcement);
 };
