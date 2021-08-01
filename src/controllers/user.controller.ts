@@ -1,6 +1,6 @@
-import { User } from "../models/User";
+import { IUserModel, User } from "../models/User";
 import { Request, Response, NextFunction, Router } from "express";
-import { Application } from "../models/application";
+import { Application, ApplicationDto } from "../models/application";
 import { isValidObjectId } from "mongoose";
 import { ObjectId } from "bson";
 import {
@@ -8,12 +8,17 @@ import {
   logInChecker,
 } from "../middleware/authentication";
 import { Role } from "../enums/user.enums";
-import { hasPermission } from "../util";
-import {
+import { hasPermission, userMatches } from "../util";
+import Exception, {
   BadRequestException,
   NotFoundException,
   UnauthorizedException,
 } from "../util/exceptions";
+import { getGlobalValues } from "./globals.controller";
+import { ApplicationsStatus } from "../enums/globals.enums";
+import { uploadToStorage } from "../services/storage.service";
+import logger from "../util/logger";
+import multer from "multer";
 
 const router = Router();
 
@@ -93,7 +98,7 @@ const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   console.log(id);
   if (!ObjectId.isValid(id))
     return next(new BadRequestException("Invalid user id"));
-  const user = await User.findById(id).lean().exec();
+  const user = await User.findById(id).populate("application").exec();
 
   if (!user) return next(new BadRequestException("User does not exist"));
   res.status(200).send(user);
@@ -144,8 +149,78 @@ const updateUserById = async (
   res.status(200).send({ user: result });
 };
 
-const apply = async (req: Request, res: Response) => {
-  return;
+const apply = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id))
+    return next(new BadRequestException("Invalid user ID"));
+  const user: IUserModel = await User.findById(id).exec();
+  if (!user) return next(new BadRequestException("User not found"));
+  const currUser: any = req.user;
+  if (!userMatches(currUser, id))
+    return next(
+      new BadRequestException("You are not authorized to edit this application")
+    );
+  const globals = await getGlobalValues();
+  const closed =
+    currUser.role === Role.ADMIN
+      ? false
+      : globals.applicationsStatus === ApplicationsStatus.CLOSED;
+
+  if (closed)
+    next(new UnauthorizedException("Sorry, applications are closed!"));
+
+  const files: Express.Multer.File[] = req.files
+    ? (req.files as Express.Multer.File[])
+    : [];
+
+  const resume = files.find((file) => file.fieldname === "resume");
+
+  const applicationBody: ApplicationDto = req.body;
+  if (resume) {
+    try {
+      applicationBody.resume = await uploadToStorage(
+        resume,
+        "resumes",
+        currUser
+      );
+    } catch (error) {
+      logger.error("Error uploading resume:", { err: error });
+      if (error.code === 429) {
+        return next(
+          new BadRequestException(
+            "You are uploading your resume too fast! Please try again in 5 minutes!"
+          )
+        );
+      } else {
+        return next(
+          new BadRequestException(
+            "Your resume couldn't be uploaded, please try again later"
+          )
+        );
+      }
+    }
+  }
+
+  const appQuery = Application.findOneAndUpdate(
+    { user },
+    { ...applicationBody, user },
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }
+  ).populate("user");
+
+  try {
+    if (hasPermission(currUser, Role.EXEC)) appQuery.select("+statusInternal");
+    const app = await appQuery.exec();
+    user.application = app;
+    await user.save();
+    res.status(200).json({ app });
+  } catch (error) {
+    logger.error(error);
+    next(new Exception(error));
+  }
 };
 
 router.use(logInChecker);
@@ -184,5 +259,13 @@ router.put(
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, []),
   updateUserById
+);
+
+router.post(
+  "/:id/apply",
+  multer().array("resume", 1),
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, []),
+  apply
 );
 export default router;

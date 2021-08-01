@@ -36,3 +36,6 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.lock
+
+# google credentials
+helloworld2021key.json
