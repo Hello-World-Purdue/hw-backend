@@ -7,7 +7,7 @@ import { IUserModel, UserDto } from "../models/User";
 
 sendGrid.setApiKey(CONFIG.SENDGRID_KEY);
 
-export const sendResetEmail = (user: IUserModel) => {
+export const sendResetEmail = (user: IUserModel): any => {
   const url =
     CONFIG.NODE_ENV !== "production"
       ? "http://localhost:5000"
@@ -30,7 +30,7 @@ export const sendResetEmail = (user: IUserModel) => {
   } as any);
 };
 
-export const sendTestMail = (user: IUserModel) => {
+export const sendTestMail = (user: IUserModel): any => {
   const url =
     CONFIG.NODE_ENV !== "production"
       ? "http://localhost:5000"
@@ -51,7 +51,7 @@ export const sendTestMail = (user: IUserModel) => {
   } as any);
 };
 
-export const sendAccountCreatedEmail = (user: IUserModel) => {
+export const sendAccountCreatedEmail = (user: IUserModel): any => {
   const url =
     CONFIG.NODE_ENV !== "production"
       ? "http://localhost:5000"
@@ -74,7 +74,7 @@ export const sendAccountCreatedEmail = (user: IUserModel) => {
   } as any);
 };
 
-export const sendErrorEmail = (error: Error) => {
+export const sendErrorEmail = (error: Error): any => {
   return sendGrid.send({
     templateId: "d-9fbbdf1f9c90423a80d69b83885eefa8",
     from: `${CONFIG.ORG_NAME} <${CONFIG.EMAIL}>`,

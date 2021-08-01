@@ -1,6 +1,6 @@
 import Server from "./server";
 
-export const start = async () => {
+export const start = async (): Promise<any> => {
   try {
     const server = await Server.createServerInstance();
     await server.start();

@@ -112,7 +112,7 @@ export default class Server {
   }
 
   public async start(): Promise<any> {
-    await this.initFrontend();
+    //await this.initFrontend();
 
     this.httpServer.listen(CONFIG.PORT, () => {
       CONFIG.PORT = (this.httpServer.address() as AddressInfo).port;

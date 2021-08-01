@@ -1,8 +1,16 @@
 import { NextFunction, Request, Response, Router } from "express";
 import logger from "../util/logger";
 import { User } from "../models/User";
-import { signToken } from "../util";
-import { BadRequestException, NotFoundException } from "../util/exceptions";
+import { extractToken, signToken } from "../util";
+import * as jwt from "jsonwebtoken";
+import {
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from "../util/exceptions";
+import CONFIG from "../config";
+import { sendResetEmail } from "../services/email.service";
+import { isValidObjectId } from "mongoose";
 
 const router = Router();
 
@@ -36,7 +44,6 @@ const signUp = async (
     return next(
       new BadRequestException("An accound already exists with that email!")
     );
-  //return next("An account already exists with that email!");
 
   delete userData.passwordConfirm;
 
@@ -77,7 +84,85 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+const refresh = async (req: Request, res: Response, next: NextFunction) => {
+  //Renew user's auth token
+  let token = extractToken(req);
+  if (!token || token === "null" || token === "undefined")
+    return next(new UnauthorizedException("No token provided"));
+  const payload: any = jwt.decode(token);
+  const user = await User.findById(payload._id).exec();
+  if (!user) next(new UnauthorizedException("User not found"));
+  token = signToken(user);
+  logger.info("Refreshing token");
+  res.status(200).json({ user, token });
+};
+
+const forgot = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+  //TODO: put regex for checking valid emails
+  if (!email)
+    return next(new BadRequestException("Please provide a valid email"));
+  const user = await User.findOne({ email }).exec();
+  if (!user)
+    next(new BadRequestException(`There is no user with the email: ${email}`));
+  const token = jwt.sign({ id: user._id }, CONFIG.SECRET, {
+    expiresIn: "2 days",
+  });
+  user.resetPasswordToken = token;
+  await user.save();
+  await sendResetEmail(user);
+  res
+    .status(200)
+    .json({ msg: `A link to reset your password has been sent to: ${email}` });
+};
+
+const reset = async (req: Request, res: Response, next: NextFunction) => {
+  const { password, passwordConfirm, token } = req.body;
+  if (!password || password.length < 5)
+    return next(
+      new BadRequestException("A password longer than 5 characters is required")
+    );
+  if (!passwordConfirm)
+    next(new BadRequestException("Please confirm your password"));
+  if (passwordConfirm !== password)
+    next(new BadRequestException("Passwords did not match"));
+
+  if (!token)
+    return next(new UnauthorizedException("Invalid reset password token"));
+  let payload: { id: string };
+  try {
+    payload = jwt.verify(token, CONFIG.SECRET) as any;
+  } catch (error) {
+    return next(new UnauthorizedException("Invalid reset password token"));
+  }
+  if (!payload)
+    return next(new UnauthorizedException("Invalid reset password token"));
+  const { id } = payload;
+  if (!id || !isValidObjectId(id))
+    next(
+      new BadRequestException(
+        "Reset password token corresponds to an invalid user"
+      )
+    );
+  const user = await User.findById(id).select("+resetPasswordToken").exec();
+  if (!user)
+    next(
+      new BadRequestException(
+        "Reset password token corresponds to a non existing user"
+      )
+    );
+  if (user.resetPasswordToken !== token)
+    next(new UnauthorizedException("Wrong reset password token for this user"));
+  user.password = password;
+  user.resetPasswordToken = "";
+  await user.save();
+  return `Successfully changed password for: ${user.name}`;
+};
+
 router.post("/signup", signUp);
 router.post("/login", login);
+router.get("/refresh", refresh);
+router.post("/forgot", forgot);
+router.post("/reset", reset);
 
 export default router;
