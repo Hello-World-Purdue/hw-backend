@@ -1,6 +1,6 @@
 import CONFIG from "../config";
 import { Storage } from "@google-cloud/storage";
-import { UserDto } from "../models/user";
+import { UserDto } from "../models/User";
 import { BadRequestException } from "../util/exceptions";
 
 const storage = new Storage({
