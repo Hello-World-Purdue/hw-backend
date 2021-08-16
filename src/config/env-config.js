@@ -24,7 +24,8 @@ const serverRuntimeConfig = {
   SECRET: env.SECRET || "my-secret",
   SENDGRID_KEY: env.SENDGRID_KEY || "mysendgridkey",
   DISCORD_WEBHOOK_ID: env.DISCORD_WEBHOOK_ID || "my discord webhook id",
-  DISCORD_WEBHOOK_TOKEN: env.DISCORD_WEBHOOK_TOKEN || "my discord webhook token",
+  DISCORD_WEBHOOK_TOKEN:
+    env.DISCORD_WEBHOOK_TOKEN || "my discord webhook token",
   VAPID_PRIVATE: env.VAPID_PRIVATE || "my vapid private key",
   HEADLESS: !!env.HEADLESS || false,
   SLACK_TOKEN: env.SLACK_TOKEN || "myslacktoken",

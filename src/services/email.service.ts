@@ -14,7 +14,7 @@ export const sendResetEmail = (user: IUserModel): any => {
       : "https://www.helloworldpurdue.com";
 
   sendGrid.send({
-    templateId: "d-f534db9ac5df4fa5a0dc273095582e9d",
+    templateId: "d-54f38bb5543141f39ea71490d2528ddd",
     from: `${CONFIG.ORG_NAME} <${CONFIG.EMAIL}>`,
     to: user.email,
     dynamicTemplateData: {
@@ -58,7 +58,7 @@ export const sendAccountCreatedEmail = (user: IUserModel): any => {
       : "https://www.helloworldpurdue.com";
 
   return sendGrid.send({
-    templateId: "d-0bba1a0346c24bd69a46d81d2e950e55",
+    templateId: "d-6b46dc0eb7914b8db689a7952ce11d91",
     from: `${CONFIG.ORG_NAME} <${CONFIG.EMAIL}>`,
     to: user.email,
     dynamicTemplateData: {
@@ -76,7 +76,7 @@ export const sendAccountCreatedEmail = (user: IUserModel): any => {
 
 export const sendErrorEmail = (error: Error): any => {
   return sendGrid.send({
-    templateId: "d-9fbbdf1f9c90423a80d69b83885eefa8",
+    templateId: "d-3abae7d5e71b4077aa30e1d710b18fa5",
     from: `${CONFIG.ORG_NAME} <${CONFIG.EMAIL}>`,
     to: "purduehackers@gmail.com",
     dynamicTemplateData: {
@@ -98,15 +98,15 @@ export const sendErrorEmail = (error: Error): any => {
 };
 
 const sendAcceptanceEmails = (users: UserDto[]) => {
-  return sendMassEmail("d-316e8d8337dc460eb12148c82a51ba86", users);
+  return sendMassEmail(" d-16c940dfa59c40e7895d2cd96649fb09", users);
 };
 
 const sendRejectedEmails = (users: UserDto[]) => {
-  return sendMassEmail("d-54335b858a324aa89c948856653bf40e", users);
+  return sendMassEmail("d-f67f79d3cf8d4796a1dfe83415245cbf", users);
 };
 
 const sendWaitlistedEmails = (users: UserDto[]) => {
-  return sendMassEmail("d-29fa0a4a1e064e7383afadc49062273c", users);
+  return sendMassEmail("d-036f9306ee4c40dbbbf1d6436a951713", users);
 };
 
 const sendMassEmail = (templateId: string, users: UserDto[]) => {
@@ -117,7 +117,7 @@ const sendMassEmail = (templateId: string, users: UserDto[]) => {
       personalizations: users.map((user) => ({
         to: user.email,
         // eslint-disable-next-line
-                  dynamic_template_data: {
+        dynamic_template_data: {
           name: user.name,
         },
       })),
