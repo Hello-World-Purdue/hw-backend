@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendAnnouncement = void 0;
 const discord_js_1 = __importDefault(require("discord.js"));
 const config_1 = __importDefault(require("../config"));
 /*
@@ -15,8 +14,7 @@ const config_1 = __importDefault(require("../config"));
  */
 const hook = new discord_js_1.default.WebhookClient(config_1.default.DISCORD_WEBHOOK_ID, config_1.default.DISCORD_WEBHOOK_TOKEN);
 // Send a message using the webhook
-const sendAnnouncement = (announcement) => {
+exports.sendAnnouncement = (announcement) => {
     hook.send(announcement);
 };
-exports.sendAnnouncement = sendAnnouncement;
 //# sourceMappingURL=discord.service.js.map

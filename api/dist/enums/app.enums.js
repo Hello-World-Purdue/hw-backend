@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Resume = exports.Major = exports.Status = exports.ShirtSize = exports.Referral = exports.gradYears = exports.ClassYear = exports.ethnicities = exports.Gender = void 0;
 var Gender;
 (function (Gender) {
     Gender["MALE"] = "Male";

@@ -7,15 +7,15 @@ import { IUserModel, UserDto } from "../models/User";
 
 sendGrid.setApiKey(CONFIG.SENDGRID_KEY);
 
-export const sendResetEmail = (user: IUserModel): any => {
+export const sendResetEmail = async (user: IUserModel): Promise<any> => {
   const url =
     CONFIG.NODE_ENV !== "production"
       ? "http://localhost:5000"
       : "https://www.helloworldpurdue.com";
 
-  sendGrid.send({
+  await sendGrid.send({
     templateId: "d-54f38bb5543141f39ea71490d2528ddd",
-    from: `${CONFIG.ORG_NAME} <${CONFIG.EMAIL}>`,
+    from: `${CONFIG.EMAIL}`,
     to: user.email,
     dynamicTemplateData: {
       name: user.name,
@@ -30,14 +30,13 @@ export const sendResetEmail = (user: IUserModel): any => {
   } as any);
 };
 
-export const sendTestMail = (user: IUserModel): any => {
+export const sendTestMail = async (user: IUserModel): Promise<any> => {
   const url =
     CONFIG.NODE_ENV !== "production"
       ? "http://localhost:5000"
       : "https://www.helloworldpurdue.com";
 
-  sendGrid.send({
-    templateId: "d-f534db9ac5df4fa5a0dc273095582e9d",
+  const ret = await sendGrid.send({
     from: "helloworldpurdue@gmail.com",
     to: "rhythm.goel.17@gmail.com",
     subject: "Sending with SendGrid is Fun",
@@ -49,6 +48,7 @@ export const sendTestMail = (user: IUserModel): any => {
       },
     },
   } as any);
+  console.log(ret);
 };
 
 export const sendAccountCreatedEmail = (user: IUserModel): any => {
@@ -59,13 +59,14 @@ export const sendAccountCreatedEmail = (user: IUserModel): any => {
 
   return sendGrid.send({
     templateId: "d-6b46dc0eb7914b8db689a7952ce11d91",
-    from: `${CONFIG.ORG_NAME} <${CONFIG.EMAIL}>`,
+    from: `${CONFIG.EMAIL}`,
     to: user.email,
-    dynamicTemplateData: {
-      name: user.name,
-      url,
-      token: user.resetPasswordToken,
-    },
+    subject: "<Hello World> Thank you for signing up",
+    text:
+      "This is to confirm that you have been signed up for hello world 2021",
+    // dynamicTemplateData: {
+    //   name: user.name,
+    // },
     mailSettings: {
       sandboxMode: {
         enable: CONFIG.NODE_ENV === "test",

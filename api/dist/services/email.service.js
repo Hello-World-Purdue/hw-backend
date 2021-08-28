@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,13 +18,13 @@ const config_1 = __importDefault(require("../config"));
 // using Twilio SendGrid's v3 Node.js Library
 // https://github.com/sendgrid/sendgrid-nodejs
 mail_1.default.setApiKey(config_1.default.SENDGRID_KEY);
-const sendResetEmail = (user) => {
+const sendResetEmail = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const url = config_1.default.NODE_ENV !== "production"
         ? "http://localhost:5000"
         : "https://www.helloworldpurdue.com";
-    mail_1.default.send({
+    yield mail_1.default.send({
         templateId: "d-54f38bb5543141f39ea71490d2528ddd",
-        from: `${config_1.default.ORG_NAME} <${config_1.default.EMAIL}>`,
+        from: `${config_1.default.EMAIL}`,
         to: user.email,
         dynamicTemplateData: {
             name: user.name,
@@ -28,14 +37,13 @@ const sendResetEmail = (user) => {
             },
         },
     });
-};
+});
 exports.sendResetEmail = sendResetEmail;
-const sendTestMail = (user) => {
+const sendTestMail = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const url = config_1.default.NODE_ENV !== "production"
         ? "http://localhost:5000"
         : "https://www.helloworldpurdue.com";
-    mail_1.default.send({
-        templateId: "d-f534db9ac5df4fa5a0dc273095582e9d",
+    const ret = yield mail_1.default.send({
         from: "helloworldpurdue@gmail.com",
         to: "rhythm.goel.17@gmail.com",
         subject: "Sending with SendGrid is Fun",
@@ -47,7 +55,8 @@ const sendTestMail = (user) => {
             },
         },
     });
-};
+    console.log(ret);
+});
 exports.sendTestMail = sendTestMail;
 const sendAccountCreatedEmail = (user) => {
     const url = config_1.default.NODE_ENV !== "production"
@@ -55,13 +64,13 @@ const sendAccountCreatedEmail = (user) => {
         : "https://www.helloworldpurdue.com";
     return mail_1.default.send({
         templateId: "d-6b46dc0eb7914b8db689a7952ce11d91",
-        from: `${config_1.default.ORG_NAME} <${config_1.default.EMAIL}>`,
+        from: `${config_1.default.EMAIL}`,
         to: user.email,
-        dynamicTemplateData: {
-            name: user.name,
-            url,
-            token: user.resetPasswordToken,
-        },
+        subject: "<Hello World> Thank you for signing up",
+        text: "This is to confirm that you have been signed up for hello world 2021",
+        // dynamicTemplateData: {
+        //   name: user.name,
+        // },
         mailSettings: {
             sandboxMode: {
                 enable: config_1.default.NODE_ENV === "test",

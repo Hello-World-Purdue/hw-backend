@@ -9,7 +9,11 @@ import {
   UnauthorizedException,
 } from "../util/exceptions";
 import CONFIG from "../config";
-import { sendResetEmail } from "../services/email.service";
+import {
+  sendAccountCreatedEmail,
+  sendResetEmail,
+  sendTestMail,
+} from "../services/email.service";
 import { isValidObjectId } from "mongoose";
 
 const router = Router();
@@ -27,7 +31,8 @@ const signUp = async (
     return next(
       new BadRequestException("Password should be larger than 5 characters")
     );
-  if (!passwordConfirm) return next("Please confirm your password");
+  if (!passwordConfirm)
+    return next(new BadRequestException("Please confirm your password"));
   if (passwordConfirm !== password)
     return next(new BadRequestException("Passwords don't match"));
 
@@ -55,6 +60,12 @@ const signUp = async (
     const token = signToken(userJson);
 
     logger.info("User has successfully signed up", user);
+    try {
+      await sendAccountCreatedEmail(user);
+    } catch (e) {
+      console.log(e);
+      logger.info(e);
+    }
 
     res.status(200).json({
       user: userJson,
@@ -72,7 +83,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   if (!user)
     return next(new NotFoundException("User not found, login failed!"));
 
-  if (!(await user.comparePassword(password))) return next("Wrong password");
+  if (!(await user.comparePassword(password)))
+    return next(new BadRequestException("Wrong password"));
 
   const userJson: any = user.toJSON();
   delete userJson.password;

@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnnouncementLabel = void 0;
 var AnnouncementLabel;
 (function (AnnouncementLabel) {
     AnnouncementLabel["EVENTS"] = "Events";

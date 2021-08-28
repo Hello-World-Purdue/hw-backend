@@ -49,7 +49,7 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     if (!password || password.length < 5)
         return next(new exceptions_1.BadRequestException("Password should be larger than 5 characters"));
     if (!passwordConfirm)
-        return next("Please confirm your password");
+        return next(new exceptions_1.BadRequestException("Please confirm your password"));
     if (passwordConfirm !== password)
         return next(new exceptions_1.BadRequestException("Passwords don't match"));
     if (!userData.email.endsWith("purdue.edu"))
@@ -67,6 +67,13 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         delete userJson.password;
         const token = util_1.signToken(userJson);
         logger_1.default.info("User has successfully signed up", user);
+        try {
+            yield email_service_1.sendAccountCreatedEmail(user);
+        }
+        catch (e) {
+            console.log(e);
+            logger_1.default.info(e);
+        }
         res.status(200).json({
             user: userJson,
             token,
@@ -83,7 +90,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     if (!user)
         return next(new exceptions_1.NotFoundException("User not found, login failed!"));
     if (!(yield user.comparePassword(password)))
-        return next("Wrong password");
+        return next(new exceptions_1.BadRequestException("Wrong password"));
     const userJson = user.toJSON();
     delete userJson.password;
     const token = util_1.signToken(userJson);
