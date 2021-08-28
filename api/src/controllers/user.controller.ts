@@ -111,7 +111,7 @@ const updateUserById = async (
 ) => {
   const id = req.params.id;
   const userObject = req.body;
-  const currentUser = req.user;
+  const currentUser: any = req.user;
 
   if (!isValidObjectId(id)) {
     //return error: invalid user id
@@ -123,7 +123,7 @@ const updateUserById = async (
     return next(new NotFoundException("The user is not found!"));
   }
 
-  if (id !== currentUser) {
+  if (`${id}` !== `${currentUser._id}`) {
     //return error: Unauthorized to edit the profile
     return next(
       new UnauthorizedException(
@@ -135,7 +135,7 @@ const updateUserById = async (
   if (
     !userObject ||
     !userObject.name ||
-    !/([a-zA-Z']+ )+[a-zA-Z']+$/.test(userObject.name)
+    !/([a-zA-Z0-9']+ )+[a-zA-Z0-9']+$/.test(userObject.name)
   ) {
     //return error: Provide your first and last name
     return next(new BadRequestException("Provide your first and last name"));
