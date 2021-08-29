@@ -6,6 +6,7 @@ import { decode, verify } from "jsonwebtoken";
 import { ObjectId } from "bson";
 import logger from "../util/logger";
 import CONFIG from "../config/";
+import { UnauthorizedException } from "../util/exceptions";
 
 export const checkCurrentUserFromToken = async (
   request: Request
@@ -44,7 +45,7 @@ export const authorizationMiddleware = async (
   try {
     await authorization(req, roles);
   } catch (e) {
-    next(e);
+    next(new UnauthorizedException(e));
   }
   next();
 };
@@ -55,7 +56,7 @@ export const logInChecker = async (
   next: NextFunction
 ): Promise<any> => {
   const user = await checkCurrentUserFromToken(req);
-  if (!user) next("You are not logged in!");
+  if (!user) next(new UnauthorizedException("You are not logged in!"));
   req.user = user;
   next();
 };
