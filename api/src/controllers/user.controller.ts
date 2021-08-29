@@ -142,9 +142,11 @@ const updateUserById = async (
   }
 
   //update query
-  const result = await User.findByIdAndUpdate(id, { name: userObject.name })
-    .lean()
-    .exec();
+  const result = await User.findByIdAndUpdate(
+    id,
+    { name: userObject.name },
+    { new: true }
+  );
 
   res.status(200).send({ user: result });
 };
