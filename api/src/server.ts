@@ -39,8 +39,8 @@ export default class Server {
     this.app = express();
     this.setup();
     this.nextApp = next({
-      dev: NODE_ENV === "development",
-      dir: join(__dirname, "/../frontend"),
+      dev: NODE_ENV === "production",
+      dir: join(__dirname, "/../../frontend"),
     });
   }
 
@@ -48,22 +48,22 @@ export default class Server {
     try {
       await this.nextApp.prepare();
       const handle = this.nextApp.getRequestHandler();
-      if (CONFIG.NODE_ENV === "production") {
-        this.app.use(
-          "/service-worker.js",
-          express.static("frontend/.next/service-worker.js")
-        );
-      } else {
-        this.app.use(
-          "/service-worker.js",
-          express.static("frontend/service-worker.js")
-        );
-      }
-      this.app.use(
-        "/manifest.json",
-        express.static("frontend/static/manifest.json")
-      );
-      this.app.use("/robots.txt", express.static("frontend/static/robots.txt"));
+      // if (CONFIG.NODE_ENV === "production") {
+      //   this.app.use(
+      //     "/service-worker.js",
+      //     express.static("dist/.next/service-worker.js")
+      //   );
+      // } else {
+      //   this.app.use(
+      //     "/service-worker.js",
+      //     express.static("../frontend/service-worker.js")
+      //   );
+      // }
+      // this.app.use(
+      //   "/manifest.json",
+      //   express.static("../frontend/static/manifest.json")
+      // );
+      //this.app.use("/robots.txt", express.static("frontend/static/robots.txt"));
       this.app.get("*", (req, res) => {
         return handle(req, res);
       });
@@ -112,8 +112,8 @@ export default class Server {
   }
 
   public async start(): Promise<any> {
-    //await this.initFrontend();
-
+    console.log(join(__dirname, "../../frontend"));
+    await this.initFrontend();
     this.httpServer.listen(CONFIG.PORT, () => {
       CONFIG.PORT = (this.httpServer.address() as AddressInfo).port;
       console.log("CONFIG:", CONFIG);
