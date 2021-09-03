@@ -112,8 +112,7 @@ export default class Server {
   }
 
   public async start(): Promise<any> {
-    console.log(join(__dirname, "../../frontend"));
-    await this.initFrontend();
+    // await this.initFrontend();
     this.httpServer.listen(CONFIG.PORT, () => {
       CONFIG.PORT = (this.httpServer.address() as AddressInfo).port;
       console.log("CONFIG:", CONFIG);
