@@ -6,6 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Application = exports.ApplicationDto = void 0;
 const mongoose_1 = require("mongoose");
 const class_validator_1 = require("class-validator");
 // import { IUserModel } from "./user";

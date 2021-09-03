@@ -18,7 +18,7 @@ import { AddressInfo } from "net";
 import userRouter from "./controllers/user.controller";
 import authRouter from "./controllers/auth.controller";
 import { standardErrorHandler } from "./middleware/errorHandler";
-import next from "next";
+// import next from "next";
 import { join } from "path";
 
 const { NODE_ENV, MONGODB_URI } = CONFIG;
@@ -33,45 +33,45 @@ export default class Server {
   public app: express.Application;
   public mongoose: typeof mongoose;
   public httpServer: HTTPServer;
-  public nextApp;
+  // public nextApp;
 
   private constructor() {
     this.app = express();
     this.setup();
-    this.nextApp = next({
-      dev: NODE_ENV === "production",
-      dir: join(__dirname, "/../../frontend"),
-    });
+    // this.nextApp = next({
+    //   dev: NODE_ENV === "production",
+    //   dir: join(__dirname, "/../../frontend"),
+    // });
   }
 
-  public async initFrontend(): Promise<void> {
-    try {
-      await this.nextApp.prepare();
-      const handle = this.nextApp.getRequestHandler();
-      // if (CONFIG.NODE_ENV === "production") {
-      //   this.app.use(
-      //     "/service-worker.js",
-      //     express.static("dist/.next/service-worker.js")
-      //   );
-      // } else {
-      //   this.app.use(
-      //     "/service-worker.js",
-      //     express.static("../frontend/service-worker.js")
-      //   );
-      // }
-      // this.app.use(
-      //   "/manifest.json",
-      //   express.static("../frontend/static/manifest.json")
-      // );
-      //this.app.use("/robots.txt", express.static("frontend/static/robots.txt"));
-      this.app.get("*", (req, res) => {
-        return handle(req, res);
-      });
-    } catch (error) {
-      logger.error("Error setting up frontend:", error);
-      throw error;
-    }
-  }
+  // public async initFrontend(): Promise<void> {
+  //   try {
+  //     // await this.nextApp.prepare();
+  //     // const handle = this.nextApp.getRequestHandler();
+  //     // if (CONFIG.NODE_ENV === "production") {
+  //     //   this.app.use(
+  //     //     "/service-worker.js",
+  //     //     express.static("dist/.next/service-worker.js")
+  //     //   );
+  //     // } else {
+  //     //   this.app.use(
+  //     //     "/service-worker.js",
+  //     //     express.static("../frontend/service-worker.js")
+  //     //   );
+  //     // }
+  //     // this.app.use(
+  //     //   "/manifest.json",
+  //     //   express.static("../frontend/static/manifest.json")
+  //     // );
+  //     //this.app.use("/robots.txt", express.static("frontend/static/robots.txt"));
+  //     this.app.get("*", (req, res) => {
+  //       return handle(req, res);
+  //     });
+  //   } catch (error) {
+  //     logger.error("Error setting up frontend:", error);
+  //     throw error;
+  //   }
+  // }
 
   private setupMiddleware(): void {
     if (CONFIG.NODE_ENV !== "test") {

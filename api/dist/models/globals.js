@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Globals = void 0;
 const mongoose_1 = require("mongoose");
 const globals_enums_1 = require("../enums/globals.enums");
 const schema = new mongoose_1.Schema({

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ApplicationsStatus = void 0;
 var ApplicationsStatus;
 (function (ApplicationsStatus) {
     ApplicationsStatus["OPEN"] = "Open";

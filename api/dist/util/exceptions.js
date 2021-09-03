@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.UnauthorizedException = exports.NotFoundException = exports.BadRequestException = void 0;
 class Exception extends Error {
     constructor(message) {
         super();
