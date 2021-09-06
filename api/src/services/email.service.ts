@@ -55,6 +55,7 @@ export const sendAccountCreatedEmail = (user: IUserModel): any => {
         ],
         dynamic_template_data: {
           name: user.name,
+          url: `${url}/auth/reset?token=${user.resetPasswordToken}`,
         },
       },
     ],
