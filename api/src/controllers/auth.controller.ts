@@ -143,9 +143,9 @@ const reset = async (req: Request, res: Response, next: NextFunction) => {
       new BadRequestException("A password longer than 5 characters is required")
     );
   if (!passwordConfirm)
-    next(new BadRequestException("Please confirm your password"));
+    return next(new BadRequestException("Please confirm your password"));
   if (passwordConfirm !== password)
-    next(new BadRequestException("Passwords did not match"));
+    return next(new BadRequestException("Passwords did not match"));
 
   if (!token)
     return next(new UnauthorizedException("Invalid reset password token"));
@@ -159,24 +159,31 @@ const reset = async (req: Request, res: Response, next: NextFunction) => {
     return next(new UnauthorizedException("Invalid reset password token"));
   const { id } = payload;
   if (!id || !isValidObjectId(id))
-    next(
+    return next(
       new BadRequestException(
         "Reset password token corresponds to an invalid user"
       )
     );
   const user = await User.findById(id).select("+resetPasswordToken").exec();
+  console.log(user);
   if (!user)
-    next(
+    return next(
       new BadRequestException(
         "Reset password token corresponds to a non existing user"
       )
     );
-  if (user.resetPasswordToken !== token)
-    next(new UnauthorizedException("Wrong reset password token for this user"));
+  console.log(user.resetPasswordToken);
+  console.log("Token: ", token);
+  if (`${user.resetPasswordToken}`.localeCompare(`${token}`) !== 0)
+    return next(
+      new UnauthorizedException("Wrong reset password token for this user")
+    );
   user.password = password;
   user.resetPasswordToken = "";
   await user.save();
-  return `Successfully changed password for: ${user.name}`;
+  res
+    .status(200)
+    .json({ user, message: `Successfully changed password for: ${user.name}` });
 };
 
 router.post("/signup", signUp);
