@@ -1,4 +1,5 @@
 import sendGrid from "@sendgrid/mail";
+import config from "../config";
 import CONFIG from "../config";
 import { IUserModel, UserDto } from "../models/User";
 
@@ -8,10 +9,7 @@ import { IUserModel, UserDto } from "../models/User";
 sendGrid.setApiKey(CONFIG.SENDGRID_KEY);
 
 export const sendResetEmail = async (user: IUserModel): Promise<any> => {
-  const url =
-    CONFIG.NODE_ENV !== "production"
-      ? "http://localhost:5000"
-      : "https://www.helloworldpurdue.com";
+  const url = config.BASE_URL;
 
   try {
     await sendGrid.send({
@@ -43,10 +41,7 @@ export const sendResetEmail = async (user: IUserModel): Promise<any> => {
 };
 
 export const sendAccountCreatedEmail = (user: IUserModel): any => {
-  const url =
-    CONFIG.NODE_ENV !== "production"
-      ? "http://localhost:5000"
-      : "https://www.helloworldpurdue.com";
+  const url = config.BASE_URL;
 
   return sendGrid.send({
     templateId: "d-6b46dc0eb7914b8db689a7952ce11d91",
