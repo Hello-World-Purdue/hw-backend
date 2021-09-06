@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { application, NextFunction, Request, Response, Router } from "express";
 import logger from "../util/logger";
 import { User } from "../models/User";
 import { extractToken, signToken } from "../util";
 import * as jwt from "jsonwebtoken";
+import { Application, ApplicationDto } from "../models/application";
 import {
   BadRequestException,
   NotFoundException,
@@ -88,6 +89,11 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   const userJson: any = user.toJSON();
   delete userJson.password;
+
+  if (userJson.application) {
+    const app = await Application.findById(userJson.application).exec();
+    userJson.status = app.statusPublic;
+  }
 
   const token = signToken(userJson);
   res.status(200).json({
