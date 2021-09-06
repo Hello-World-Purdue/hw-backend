@@ -61,7 +61,10 @@ const signUp = async (
     const token = signToken(userJson);
 
     //remove later
-    user.resetPasswordToken = token;
+    const resetToken = jwt.sign({ id: user._id }, CONFIG.SECRET, {
+      expiresIn: "2 days",
+    });
+    user.resetPasswordToken = resetToken;
     await user.save();
 
     logger.info("User has successfully signed up", user);
@@ -169,15 +172,12 @@ const reset = async (req: Request, res: Response, next: NextFunction) => {
       )
     );
   const user = await User.findById(id).select("+resetPasswordToken").exec();
-  console.log(user);
   if (!user)
     return next(
       new BadRequestException(
         "Reset password token corresponds to a non existing user"
       )
     );
-  console.log(user.resetPasswordToken);
-  console.log("Token: ", token);
   if (`${user.resetPasswordToken}`.localeCompare(`${token}`) !== 0)
     return next(
       new UnauthorizedException("Wrong reset password token for this user")
