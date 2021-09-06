@@ -13,29 +13,33 @@ export const sendResetEmail = async (user: IUserModel): Promise<any> => {
       ? "http://localhost:5000"
       : "https://www.helloworldpurdue.com";
 
-  await sendGrid.send({
-    templateId: "d-54f38bb5543141f39ea71490d2528ddd",
-    from: `${CONFIG.EMAIL}`,
-    personalizations: [
-      {
-        to: [
-          {
-            email: user.email,
+  try {
+    await sendGrid.send({
+      templateId: "d-54f38bb5543141f39ea71490d2528ddd",
+      from: `${CONFIG.EMAIL}`,
+      personalizations: [
+        {
+          to: [
+            {
+              email: user.email,
+            },
+          ],
+          dynamic_template_data: {
+            name: user.name,
+            url: `${url}/auth/reset?token=${user.resetPasswordToken}`,
+            token: user.resetPasswordToken,
           },
-        ],
-        dynamic_template_data: {
-          name: user.name,
-          url,
-          token: user.resetPasswordToken,
+        },
+      ],
+      mailSettings: {
+        sandboxMode: {
+          enable: CONFIG.NODE_ENV === "test",
         },
       },
-    ],
-    mailSettings: {
-      sandboxMode: {
-        enable: CONFIG.NODE_ENV === "test",
-      },
-    },
-  } as any);
+    } as any);
+  } catch (e) {
+    console.log(e.response.body.errors);
+  }
 };
 
 export const sendAccountCreatedEmail = (user: IUserModel): any => {

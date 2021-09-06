@@ -122,7 +122,9 @@ const forgot = async (req: Request, res: Response, next: NextFunction) => {
     return next(new BadRequestException("Please provide a valid email"));
   const user = await User.findOne({ email }).exec();
   if (!user)
-    next(new BadRequestException(`There is no user with the email: ${email}`));
+    return next(
+      new BadRequestException(`There is no user with the email: ${email}`)
+    );
   const token = jwt.sign({ id: user._id }, CONFIG.SECRET, {
     expiresIn: "2 days",
   });
