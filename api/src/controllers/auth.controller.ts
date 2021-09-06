@@ -99,7 +99,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   if (userJson.application) {
     const app = await Application.findById(userJson.application).exec();
-    userJson.status = app.statusPublic;
+    userJson.application = app;
   }
 
   const token = signToken(userJson);
