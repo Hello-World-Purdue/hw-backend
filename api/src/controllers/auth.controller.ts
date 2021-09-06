@@ -60,6 +60,10 @@ const signUp = async (
     delete userJson.password;
     const token = signToken(userJson);
 
+    //remove later
+    user.resetPasswordToken = token;
+    await user.save();
+
     logger.info("User has successfully signed up", user);
     try {
       await sendAccountCreatedEmail(user);
