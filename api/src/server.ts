@@ -20,6 +20,7 @@ import authRouter from "./controllers/auth.controller";
 import { standardErrorHandler } from "./middleware/errorHandler";
 // import next from "next";
 import { join } from "path";
+import { setUpAnnouncements } from "./services/announcement.service";
 
 const { NODE_ENV, MONGODB_URI } = CONFIG;
 
@@ -156,5 +157,7 @@ export default class Server {
     this.setupErrorHandler();
 
     this.httpServer = createHttpServer(this.app);
+
+    setUpAnnouncements(this.httpServer);
   }
 }

@@ -31,7 +31,7 @@ const schema = new Schema(
   {
     title: { type: String, required: true },
     body: { type: String, required: true },
-    labels: { type: [String], required: true },
+    label: { type: String, required: true },
     released: { type: Boolean, default: false },
     slackTS: { type: String, default: "" },
   },
