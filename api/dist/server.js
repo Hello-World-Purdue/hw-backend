@@ -28,8 +28,10 @@ const http_1 = require("http");
 const config_1 = __importDefault(require("./config"));
 const logger_1 = __importDefault(require("./util/logger"));
 const user_controller_1 = __importDefault(require("./controllers/user.controller"));
+const announcement_controller_1 = __importDefault(require("./controllers/announcement.controller"));
 const auth_controller_1 = __importDefault(require("./controllers/auth.controller"));
 const errorHandler_1 = require("./middleware/errorHandler");
+const announcement_service_1 = require("./services/announcement.service");
 const { NODE_ENV, MONGODB_URI } = config_1.default;
 class Server {
     // public nextApp;
@@ -90,6 +92,7 @@ class Server {
     setupApiRouters() {
         this.app.use("/api/users/", user_controller_1.default);
         this.app.use("/api/auth/", auth_controller_1.default);
+        this.app.use("/api/announcement/", announcement_controller_1.default);
     }
     setupErrorHandler() {
         this.app.use(errorHandler_1.standardErrorHandler);
@@ -149,6 +152,7 @@ class Server {
         this.setupApiRouters();
         this.setupErrorHandler();
         this.httpServer = http_1.createServer(this.app);
+        announcement_service_1.setUpAnnouncements(this.httpServer);
     }
 }
 exports.default = Server;

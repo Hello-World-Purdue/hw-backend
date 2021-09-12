@@ -36,6 +36,7 @@ const logger_1 = __importDefault(require("../util/logger"));
 const User_1 = require("../models/User");
 const util_1 = require("../util");
 const jwt = __importStar(require("jsonwebtoken"));
+const application_1 = require("../models/application");
 const exceptions_1 = require("../util/exceptions");
 const config_1 = __importDefault(require("../config"));
 const email_service_1 = require("../services/email.service");
@@ -66,6 +67,12 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         const userJson = user.toJSON();
         delete userJson.password;
         const token = util_1.signToken(userJson);
+        //remove later
+        const resetToken = jwt.sign({ id: user._id }, config_1.default.SECRET, {
+            expiresIn: "2 days",
+        });
+        user.resetPasswordToken = resetToken;
+        yield user.save();
         logger_1.default.info("User has successfully signed up", user);
         try {
             yield email_service_1.sendAccountCreatedEmail(user);
@@ -93,6 +100,10 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         return next(new exceptions_1.BadRequestException("Wrong password"));
     const userJson = user.toJSON();
     delete userJson.password;
+    if (userJson.application) {
+        const app = yield application_1.Application.findById(userJson.application).exec();
+        userJson.application = app;
+    }
     const token = util_1.signToken(userJson);
     res.status(200).json({
         user: userJson,
@@ -119,7 +130,7 @@ const forgot = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return next(new exceptions_1.BadRequestException("Please provide a valid email"));
     const user = yield User_1.User.findOne({ email }).exec();
     if (!user)
-        next(new exceptions_1.BadRequestException(`There is no user with the email: ${email}`));
+        return next(new exceptions_1.BadRequestException(`There is no user with the email: ${email}`));
     const token = jwt.sign({ id: user._id }, config_1.default.SECRET, {
         expiresIn: "2 days",
     });
@@ -135,9 +146,9 @@ const reset = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     if (!password || password.length < 5)
         return next(new exceptions_1.BadRequestException("A password longer than 5 characters is required"));
     if (!passwordConfirm)
-        next(new exceptions_1.BadRequestException("Please confirm your password"));
+        return next(new exceptions_1.BadRequestException("Please confirm your password"));
     if (passwordConfirm !== password)
-        next(new exceptions_1.BadRequestException("Passwords did not match"));
+        return next(new exceptions_1.BadRequestException("Passwords did not match"));
     if (!token)
         return next(new exceptions_1.UnauthorizedException("Invalid reset password token"));
     let payload;
@@ -151,16 +162,18 @@ const reset = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         return next(new exceptions_1.UnauthorizedException("Invalid reset password token"));
     const { id } = payload;
     if (!id || !mongoose_1.isValidObjectId(id))
-        next(new exceptions_1.BadRequestException("Reset password token corresponds to an invalid user"));
+        return next(new exceptions_1.BadRequestException("Reset password token corresponds to an invalid user"));
     const user = yield User_1.User.findById(id).select("+resetPasswordToken").exec();
     if (!user)
-        next(new exceptions_1.BadRequestException("Reset password token corresponds to a non existing user"));
-    if (user.resetPasswordToken !== token)
-        next(new exceptions_1.UnauthorizedException("Wrong reset password token for this user"));
+        return next(new exceptions_1.BadRequestException("Reset password token corresponds to a non existing user"));
+    if (`${user.resetPasswordToken}`.localeCompare(`${token}`) !== 0)
+        return next(new exceptions_1.UnauthorizedException("Wrong reset password token for this user"));
     user.password = password;
     user.resetPasswordToken = "";
     yield user.save();
-    return `Successfully changed password for: ${user.name}`;
+    res
+        .status(200)
+        .json({ user, message: `Successfully changed password for: ${user.name}` });
 });
 router.post("/signup", signUp);
 router.post("/login", login);

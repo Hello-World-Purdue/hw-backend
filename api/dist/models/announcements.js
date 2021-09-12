@@ -27,12 +27,12 @@ __decorate([
         message: "Please provide a valid announcement label",
         each: true,
     })
-], AnnouncementDto.prototype, "labels", void 0);
+], AnnouncementDto.prototype, "label", void 0);
 exports.AnnouncementDto = AnnouncementDto;
 const schema = new mongoose_1.Schema({
     title: { type: String, required: true },
     body: { type: String, required: true },
-    labels: { type: [String], required: true },
+    label: { type: String, required: true },
     released: { type: Boolean, default: false },
     slackTS: { type: String, default: "" },
 }, { timestamps: true });

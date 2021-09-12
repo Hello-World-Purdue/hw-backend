@@ -189,6 +189,40 @@ const apply = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         next(new exceptions_1.default(error));
     }
 });
+const rsvpUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const currentUser = req.user;
+    if (!mongoose_1.isValidObjectId(id)) {
+        //return error: invalid user id
+        return next(new exceptions_1.BadRequestException("The user id is invalid!"));
+    }
+    const user = yield User_1.User.findById(id).exec();
+    if (!user) {
+        //return error: User not found
+        return next(new exceptions_1.NotFoundException("The user is not found!"));
+    }
+    if (util_1.hasPermission(currentUser, user_enums_1.Role.EXEC) ||
+        `${id}` !== `${currentUser._id}`) {
+        //return error: Unauthorized to edit the profile
+        return next(new exceptions_1.UnauthorizedException("You don't have enough permissions to edit this profile"));
+    }
+    try {
+        const application = yield application_1.Application.findById(user.application);
+        if (!application) {
+            next(new exceptions_1.BadRequestException("We couldn't find a corresponding application for you"));
+        }
+        application.rsvp = !application.rsvp;
+        const ret = yield application_1.Application.findOneAndUpdate({ _id: user.application }, Object.assign({}, application), {
+            new: true,
+            upsert: true,
+            setDefaultsOnInsert: true,
+        }).exec();
+        res.status(200).json({ application: ret });
+    }
+    catch (e) {
+        res.status(400).json({ message: e.message });
+    }
+});
 router.use(authentication_1.logInChecker);
 router.get("/", (req, res, next) => authentication_1.authorizationMiddleware(req, res, next, [user_enums_1.Role.ADMIN, user_enums_1.Role.EXEC]), getAll);
 router.get("/:id/application", (req, res, next) => authentication_1.authorizationMiddleware(req, res, next, []), getUserApplication);
@@ -197,5 +231,6 @@ router.get("/application", (req, res, next) => authentication_1.authorizationMid
 router.get("/:id(((?!application)[a-zA-Z0-9]+)$)", (req, res, next) => authentication_1.authorizationMiddleware(req, res, next, [user_enums_1.Role.EXEC]), getUserById);
 router.put("/:id", (req, res, next) => authentication_1.authorizationMiddleware(req, res, next, []), updateUserById);
 router.post("/:id/apply", multer_1.default().array("resume", 1), (req, res, next) => authentication_1.authorizationMiddleware(req, res, next, []), apply);
+router.post("/:id/rsvp", (req, res, next) => authentication_1.authorizationMiddleware(req, res, next, []), rsvpUser);
 exports.default = router;
 //# sourceMappingURL=user.controller.js.map

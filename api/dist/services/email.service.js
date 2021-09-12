@@ -15,45 +15,47 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendTestMail = exports.sendWaitlistedEmails = exports.sendRejectedEmails = exports.sendAcceptanceEmails = exports.sendErrorEmail = exports.sendAccountCreatedEmail = exports.sendResetEmail = void 0;
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const config_1 = __importDefault(require("../config"));
+const config_2 = __importDefault(require("../config"));
 // using Twilio SendGrid's v3 Node.js Library
 // https://github.com/sendgrid/sendgrid-nodejs
-mail_1.default.setApiKey(config_1.default.SENDGRID_KEY);
+mail_1.default.setApiKey(config_2.default.SENDGRID_KEY);
 const sendResetEmail = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const url = config_1.default.NODE_ENV !== "production"
-        ? "http://localhost:5000"
-        : "https://www.helloworldpurdue.com";
-    yield mail_1.default.send({
-        templateId: "d-54f38bb5543141f39ea71490d2528ddd",
-        from: `${config_1.default.EMAIL}`,
-        personalizations: [
-            {
-                to: [
-                    {
-                        email: user.email,
+    const url = config_1.default.BASE_URL;
+    try {
+        yield mail_1.default.send({
+            templateId: "d-54f38bb5543141f39ea71490d2528ddd",
+            from: `${config_2.default.EMAIL}`,
+            personalizations: [
+                {
+                    to: [
+                        {
+                            email: user.email,
+                        },
+                    ],
+                    dynamic_template_data: {
+                        name: user.name,
+                        url: `${url}/auth/reset?token=${user.resetPasswordToken}`,
+                        token: user.resetPasswordToken,
                     },
-                ],
-                dynamic_template_data: {
-                    name: user.name,
-                    url,
-                    token: user.resetPasswordToken,
+                },
+            ],
+            mailSettings: {
+                sandboxMode: {
+                    enable: config_2.default.NODE_ENV === "test",
                 },
             },
-        ],
-        mailSettings: {
-            sandboxMode: {
-                enable: config_1.default.NODE_ENV === "test",
-            },
-        },
-    });
+        });
+    }
+    catch (e) {
+        console.log(e.response.body.errors);
+    }
 });
 exports.sendResetEmail = sendResetEmail;
 const sendAccountCreatedEmail = (user) => {
-    const url = config_1.default.NODE_ENV !== "production"
-        ? "http://localhost:5000"
-        : "https://www.helloworldpurdue.com";
+    const url = config_1.default.BASE_URL;
     return mail_1.default.send({
         templateId: "d-6b46dc0eb7914b8db689a7952ce11d91",
-        from: `${config_1.default.EMAIL}`,
+        from: `${config_2.default.EMAIL}`,
         personalizations: [
             {
                 to: [
@@ -63,12 +65,13 @@ const sendAccountCreatedEmail = (user) => {
                 ],
                 dynamic_template_data: {
                     name: user.name,
+                    url: `${url}/auth/reset?token=${user.resetPasswordToken}`,
                 },
             },
         ],
         mailSettings: {
             sandboxMode: {
-                enable: config_1.default.NODE_ENV === "test",
+                enable: config_2.default.NODE_ENV === "test",
             },
         },
     });
@@ -77,7 +80,7 @@ exports.sendAccountCreatedEmail = sendAccountCreatedEmail;
 const sendErrorEmail = (error) => {
     return mail_1.default.send({
         templateId: "d-3abae7d5e71b4077aa30e1d710b18fa5",
-        from: `${config_1.default.EMAIL}`,
+        from: `${config_2.default.EMAIL}`,
         to: "purduehackers@gmail.com",
         dynamicTemplateData: {
             timestamp: new Date(Date.now()).toLocaleString([], {
@@ -91,7 +94,7 @@ const sendErrorEmail = (error) => {
         },
         mailSettings: {
             sandboxMode: {
-                enable: config_1.default.NODE_ENV !== "production",
+                enable: config_2.default.NODE_ENV !== "production",
             },
         },
     });
@@ -113,7 +116,7 @@ const sendMassEmail = (templateId, users) => {
     if (users.length)
         return mail_1.default.send({
             templateId: templateId,
-            from: `${config_1.default.EMAIL}`,
+            from: `${config_2.default.EMAIL}`,
             personalizations: users.map((user) => ({
                 to: user.email,
                 // eslint-disable-next-line
@@ -124,13 +127,13 @@ const sendMassEmail = (templateId, users) => {
             isMultiple: true,
             mailSettings: {
                 sandboxMode: {
-                    enable: config_1.default.NODE_ENV === "test",
+                    enable: config_2.default.NODE_ENV === "test",
                 },
             },
         });
 };
 const sendTestMail = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const url = config_1.default.NODE_ENV !== "production"
+    const url = config_2.default.NODE_ENV !== "production"
         ? "http://localhost:5000"
         : "https://www.helloworldpurdue.com";
     const ret = yield mail_1.default.send({
@@ -141,7 +144,7 @@ const sendTestMail = (user) => __awaiter(void 0, void 0, void 0, function* () {
         html: "<strong>and easy to do anywhere, even with Node.js</strong>",
         mailSettings: {
             sandboxMode: {
-                enable: config_1.default.NODE_ENV === "test",
+                enable: config_2.default.NODE_ENV === "test",
             },
         },
     });

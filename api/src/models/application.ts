@@ -85,6 +85,8 @@ export interface IApplicationModel extends ApplicationDto, Document {
   statusPublic: Status;
   createdAt: Date;
   updatedAt: Date;
+
+  rsvp: boolean;
 }
 
 const schema = new Schema(
@@ -129,6 +131,10 @@ const schema = new Schema(
       default: Status.PENDING,
       enum: Object.values(Status),
       select: false,
+    },
+    rsvp: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

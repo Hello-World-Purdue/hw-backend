@@ -225,6 +225,57 @@ const apply = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id;
+  const currentUser: any = req.user;
+
+  if (!isValidObjectId(id)) {
+    //return error: invalid user id
+    return next(new BadRequestException("The user id is invalid!"));
+  }
+  const user = await User.findById(id).exec();
+  if (!user) {
+    //return error: User not found
+    return next(new NotFoundException("The user is not found!"));
+  }
+
+  if (
+    hasPermission(currentUser, Role.EXEC) ||
+    `${id}` !== `${currentUser._id}`
+  ) {
+    //return error: Unauthorized to edit the profile
+    return next(
+      new UnauthorizedException(
+        "You don't have enough permissions to edit this profile"
+      )
+    );
+  }
+
+  try {
+    const application = await Application.findById(user.application);
+    if (!application) {
+      next(
+        new BadRequestException(
+          "We couldn't find a corresponding application for you"
+        )
+      );
+    }
+    application.rsvp = !application.rsvp;
+    const ret = await Application.findOneAndUpdate(
+      { _id: user.application },
+      { ...application },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    ).exec();
+    res.status(200).json({ application: ret });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+};
+
 router.use(logInChecker);
 
 router.get(
@@ -269,5 +320,12 @@ router.post(
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, []),
   apply
+);
+
+router.post(
+  "/:id/rsvp",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, []),
+  rsvpUser
 );
 export default router;

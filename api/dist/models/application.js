@@ -106,6 +106,10 @@ const schema = new mongoose_1.Schema({
         enum: Object.values(app_enums_1.Status),
         select: false,
     },
+    rsvp: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true });
 exports.Application = mongoose_1.model("Application", schema, "applications");
 //# sourceMappingURL=application.js.map

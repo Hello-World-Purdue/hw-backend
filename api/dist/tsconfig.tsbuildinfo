@@ -512,8 +512,8 @@
         "affectsGlobalScope": false
       },
       "../src/config/env-config.js": {
-        "version": "9645a7ce7764978cc52903e469815c9043fbb7c49606e4438a0e0fdbf7061874",
-        "signature": "b00b7f71c40d068170d9e92e007de335652d925048e56766c5c8c0316ff65643",
+        "version": "10b181f35bda53b79aaab48998c4dca6bc0c04ab01a270d1027ed681ccd3826d",
+        "signature": "1400229c7e1b052629ff1286843c6435a3d43c5d058cf54a6980a46e5eac14ce",
         "affectsGlobalScope": true
       },
       "../src/config/index.ts": {
@@ -1297,8 +1297,8 @@
         "affectsGlobalScope": false
       },
       "../src/models/application.ts": {
-        "version": "1089ef3023410055b86bfa12c30c5da56bf1cba9aa0c0ca5c36c934b6754be02",
-        "signature": "f1d7446ed23a70b7a4eb354076a63dde780229f17a7b7362d29afc4a0a31111e",
+        "version": "aecb145f25adf3d9fa68919dddf04203077673c252f38779e74e8833d744d399",
+        "signature": "ce46fa939772ba1266422ab1a91a040e498c2ff1a7a2994ae1cc62da264540d6",
         "affectsGlobalScope": false
       },
       "../src/enums/user.enums.ts": {
@@ -1592,7 +1592,47 @@
         "affectsGlobalScope": true
       },
       "../src/controllers/user.controller.ts": {
-        "version": "46997f3b769e383261cd7cc8ee64e933c5127cac31f5a3b7aaaa1d2fd7d8747e",
+        "version": "9f5d65e12f7f34446487797c96d8cbd237177d0bf9d6525cbe5ce8f8ccf4637b",
+        "signature": "c106970ee4b686b5ebf0964ea4e0d1b2af02bdecd2d5cfeecedeb7bb5b2f404b",
+        "affectsGlobalScope": false
+      },
+      "../src/enums/announcement.enums.ts": {
+        "version": "66881618c72ff1f1b74fb79815960f83a1f48b9464c07a61978f62f0233719ce",
+        "signature": "15c66a8cec8c2b9ebda82ce33dbfa591262a91a5c23002d4e3c7d70ac0e5aee7",
+        "affectsGlobalScope": false
+      },
+      "../src/models/announcements.ts": {
+        "version": "bed58443ae9e5c735de5107305ba57ad86d28b368573811ad4b1c722ddffc586",
+        "signature": "fa41576bf822b3e407fa84f6764812a580af17be815659c4cf3d46674c746732",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@types/ws/index.d.ts": {
+        "version": "bc81aff061c53a7140270555f4b22da4ecfe8601e8027cf5aa175fbdc7927c31",
+        "signature": "bc81aff061c53a7140270555f4b22da4ecfe8601e8027cf5aa175fbdc7927c31",
+        "affectsGlobalScope": false
+      },
+      "../src/services/announcement.service.ts": {
+        "version": "894bdf380689a7983ef296bc3d7534b88c4fc8b030cebcbfeb1368defefac17f",
+        "signature": "06020e12e7acd3f81381db27d02eef58478bcf26519d963581938575d8d1defb",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@discordjs/collection/dist/index.d.ts": {
+        "version": "7be7f76b784383fa84812ca7eb8ad10315c9d482c0d25f178645365405509d44",
+        "signature": "7be7f76b784383fa84812ca7eb8ad10315c9d482c0d25f178645365405509d44",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/discord.js/typings/index.d.ts": {
+        "version": "bbb87411988e93370461ac33c6437098c8cd39e9a7c92ea0d94b6a375dbe52cc",
+        "signature": "bbb87411988e93370461ac33c6437098c8cd39e9a7c92ea0d94b6a375dbe52cc",
+        "affectsGlobalScope": true
+      },
+      "../src/services/discord.service.ts": {
+        "version": "2c18097e817509923204eb6877ec2ffe2ea548a399e2eaaaaf71b516ecb43a50",
+        "signature": "b93f9e412473f9145453358b7f19cc29daddccc0da775c8e7bff00b6dacc6656",
+        "affectsGlobalScope": false
+      },
+      "../src/controllers/announcement.controller.ts": {
+        "version": "6ae41010637b7a77d674100d4516144c9419cea54ccade6230729b9321ae80ce",
         "signature": "c106970ee4b686b5ebf0964ea4e0d1b2af02bdecd2d5cfeecedeb7bb5b2f404b",
         "affectsGlobalScope": false
       },
@@ -1667,12 +1707,12 @@
         "affectsGlobalScope": false
       },
       "../src/services/email.service.ts": {
-        "version": "29ebb718a1dd1a53279b5dd350cb28cb35ef7ce25de1792ff4598d37262f89ef",
+        "version": "8a0173ddf31f9b913abdbe9e3b672f27e1ee5c4ec5736bcfecb3e319f6499795",
         "signature": "7d2dda6e2d789ea16123ed355c81126080bb028527ec04d1204c8c45007cf5f6",
         "affectsGlobalScope": false
       },
       "../src/controllers/auth.controller.ts": {
-        "version": "01d45cd864956b227508b84639a03400a450325ac783e7caac021a1442485e70",
+        "version": "436a28300c3ff8a8763067068cd12fee62d26aa406996c32676919e5fc77d4ec",
         "signature": "c106970ee4b686b5ebf0964ea4e0d1b2af02bdecd2d5cfeecedeb7bb5b2f404b",
         "affectsGlobalScope": false
       },
@@ -1682,7 +1722,7 @@
         "affectsGlobalScope": false
       },
       "../src/server.ts": {
-        "version": "e7df4a0987cc58a75106f9050aae8be2bbbb88d1806ff64bb1bcfe211324ee09",
+        "version": "91abc3c7311f43872a2fd9ece8e59acac7801bfb016f809de6011cbed01d03b7",
         "signature": "2484ab3ee89a9a25767c8d1ceae45cb5ea0f350d193675ac89c67ec57164202c",
         "affectsGlobalScope": false
       },
@@ -1694,41 +1734,6 @@
       "../src/config/passport.ts": {
         "version": "7416a8c02bb593eb03f6388695e0d55aab19328f5f19c7238ad339952d6977d0",
         "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "affectsGlobalScope": false
-      },
-      "../src/controllers/announcement.controller.ts": {
-        "version": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "affectsGlobalScope": false
-      },
-      "../src/enums/announcement.enums.ts": {
-        "version": "66881618c72ff1f1b74fb79815960f83a1f48b9464c07a61978f62f0233719ce",
-        "signature": "15c66a8cec8c2b9ebda82ce33dbfa591262a91a5c23002d4e3c7d70ac0e5aee7",
-        "affectsGlobalScope": false
-      },
-      "../src/models/announcements.ts": {
-        "version": "f5c128c52a05f7f4712dc96b7feeefb7f0be0fc2ff536dcf5d40f0e894ee9c1d",
-        "signature": "af417663d28e1d1e3a45d1bc91d74541f46cdd585f726c41c0291b364954b299",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@discordjs/collection/dist/index.d.ts": {
-        "version": "7be7f76b784383fa84812ca7eb8ad10315c9d482c0d25f178645365405509d44",
-        "signature": "7be7f76b784383fa84812ca7eb8ad10315c9d482c0d25f178645365405509d44",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/ws/index.d.ts": {
-        "version": "bc81aff061c53a7140270555f4b22da4ecfe8601e8027cf5aa175fbdc7927c31",
-        "signature": "bc81aff061c53a7140270555f4b22da4ecfe8601e8027cf5aa175fbdc7927c31",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/discord.js/typings/index.d.ts": {
-        "version": "bbb87411988e93370461ac33c6437098c8cd39e9a7c92ea0d94b6a375dbe52cc",
-        "signature": "bbb87411988e93370461ac33c6437098c8cd39e9a7c92ea0d94b6a375dbe52cc",
-        "affectsGlobalScope": true
-      },
-      "../src/services/discord.service.ts": {
-        "version": "ab560a963f36b4553b4e39c9ca90e37d4fc103fee68f7c902ce0a32c2327cab6",
-        "signature": "b93f9e412473f9145453358b7f19cc29daddccc0da775c8e7bff00b6dacc6656",
         "affectsGlobalScope": false
       },
       "../src/services/notifications.service.ts": {
@@ -2237,6 +2242,7 @@
         ]
       },
       "pathsBasePath": "/Users/aakarshitpandey/Downloads/coding/helloworld21-backend/api",
+      "watch": true,
       "configFilePath": "../tsconfig.json"
     },
     "referencedMap": {
@@ -3834,11 +3840,18 @@
       "../src/config/index.ts": [
         "../src/config/env-config.js"
       ],
+      "../src/controllers/announcement.controller.ts": [
+        "../node_modules/@types/express/index.d.ts",
+        "../src/models/announcements.ts",
+        "../src/services/announcement.service.ts",
+        "../src/services/discord.service.ts"
+      ],
       "../src/controllers/auth.controller.ts": [
         "../node_modules/@types/express/index.d.ts",
         "../node_modules/@types/jsonwebtoken/index.d.ts",
         "../node_modules/mongoose/index.d.ts",
         "../src/config/index.ts",
+        "../src/models/application.ts",
         "../src/models/user.ts",
         "../src/services/email.service.ts",
         "../src/util/exceptions.ts",
@@ -3926,9 +3939,16 @@
         "../node_modules/reflect-metadata/index.d.ts",
         "../node_modules/winston/index.d.ts",
         "../src/config/index.ts",
+        "../src/controllers/announcement.controller.ts",
         "../src/controllers/auth.controller.ts",
         "../src/controllers/user.controller.ts",
         "../src/middleware/errorhandler.ts",
+        "../src/services/announcement.service.ts",
+        "../src/util/logger.ts"
+      ],
+      "../src/services/announcement.service.ts": [
+        "../node_modules/@types/ws/index.d.ts",
+        "../src/models/announcements.ts",
         "../src/util/logger.ts"
       ],
       "../src/services/discord.service.ts": [
@@ -5578,6 +5598,9 @@
       "../src/config/index.ts": [
         "../src/config/env-config.js"
       ],
+      "../src/controllers/announcement.controller.ts": [
+        "../node_modules/@types/express-serve-static-core/index.d.ts"
+      ],
       "../src/controllers/auth.controller.ts": [
         "../node_modules/@types/express-serve-static-core/index.d.ts"
       ],
@@ -5617,6 +5640,9 @@
         "../node_modules/@types/node/http.d.ts",
         "../node_modules/mongoose/index.d.ts",
         "../node_modules/reflect-metadata/index.d.ts"
+      ],
+      "../src/services/announcement.service.ts": [
+        "../src/models/announcements.ts"
       ],
       "../src/services/email.service.ts": [
         "../node_modules/@sendgrid/mail/index.d.ts",
@@ -6082,6 +6108,7 @@
       "../src/models/globals.ts",
       "../src/models/user.ts",
       "../src/server.ts",
+      "../src/services/announcement.service.ts",
       "../src/services/discord.service.ts",
       "../src/services/email.service.ts",
       "../src/services/notifications.service.ts",
