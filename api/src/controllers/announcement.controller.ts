@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, Router } from "express";
 import { sendAnnouncement } from "../services/announcement.service";
 import { AnnouncementDto, Announcement } from "../models/announcements";
+import { sendAnnouncement as sendDiscordAnnouncement } from "../services/discord.service";
 
 const router = Router();
 
@@ -18,9 +19,14 @@ const createAnnouncement = async (
     label,
   });
 
-  const ret = await announcement.save();
-  sendAnnouncement(ret);
-  res.status(200).json({ announcement: ret });
+  try {
+    sendDiscordAnnouncement(`${announcement.label}: ${announcement.body}`);
+    const ret = await announcement.save();
+    sendAnnouncement(ret);
+    res.status(200).json({ announcement: ret });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 };
 
 const getAnnouncements = async (
