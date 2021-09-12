@@ -240,7 +240,7 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (
-    hasPermission(currentUser, Role.EXEC) ||
+    !hasPermission(currentUser, Role.EXEC) &&
     `${id}` !== `${currentUser._id}`
   ) {
     //return error: Unauthorized to edit the profile
@@ -251,29 +251,19 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
     );
   }
 
-  try {
-    const application = await Application.findById(user.application);
-    if (!application) {
-      next(
-        new BadRequestException(
-          "We couldn't find a corresponding application for you"
-        )
-      );
-    }
-    application.rsvp = !application.rsvp;
-    const ret = await Application.findOneAndUpdate(
-      { _id: user.application },
-      { ...application },
-      {
-        new: true,
-        upsert: true,
-        setDefaultsOnInsert: true,
-      }
-    ).exec();
-    res.status(200).json({ application: ret });
-  } catch (e) {
-    res.status(400).json({ message: e.message });
+  //update query
+  const result = await User.findByIdAndUpdate(
+    id,
+    { rsvp: !user.rsvp },
+    { new: true }
+  ).exec();
+
+  if (result.application) {
+    const app = await Application.findById(result.application).exec();
+    result.application = app;
   }
+
+  res.status(200).send({ user: result });
 };
 
 router.use(logInChecker);

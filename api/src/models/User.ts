@@ -35,6 +35,8 @@ export interface IUserModel extends Document, UserDto {
   checkedin: boolean;
   createdAt: Date;
   updatedAt: Date;
+
+  rsvp: boolean;
 }
 
 const schema = new Schema(
@@ -60,6 +62,10 @@ const schema = new Schema(
     application: {
       type: Schema.Types.ObjectId,
       ref: "Application",
+    },
+    rsvp: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
