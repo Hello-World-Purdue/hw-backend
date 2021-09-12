@@ -17,9 +17,9 @@ export const setUpAnnouncements = (server: any) => {
 export const sendAnnouncement = async (
   ancmnt: IAnnouncementModel
 ): Promise<any> => {
-  console.log(ancmnt);
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN)
-      client.send(JSON.stringify(ancmnt));
+  console.log("announcement:", ancmnt);
+  console.log(wss);
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === ws.OPEN) client.send(JSON.stringify(ancmnt));
   });
 };
