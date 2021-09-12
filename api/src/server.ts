@@ -16,6 +16,7 @@ import CONFIG from "./config";
 import logger from "./util/logger";
 import { AddressInfo } from "net";
 import userRouter from "./controllers/user.controller";
+import announcementRouter from "./controllers/announcement.controller";
 import authRouter from "./controllers/auth.controller";
 import { standardErrorHandler } from "./middleware/errorHandler";
 // import next from "next";
@@ -89,6 +90,7 @@ export default class Server {
   private setupApiRouters(): void {
     this.app.use("/api/users/", userRouter);
     this.app.use("/api/auth/", authRouter);
+    this.app.use("/api/announcement/", announcementRouter);
   }
 
   private setupErrorHandler(): void {

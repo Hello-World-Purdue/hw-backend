@@ -17,7 +17,7 @@ export class AnnouncementDto {
     message: "Please provide a valid announcement label",
     each: true,
   })
-  labels: AnnouncementLabel[];
+  label: AnnouncementLabel[];
 }
 
 export interface IAnnouncementModel extends AnnouncementDto, Document {
