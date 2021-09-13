@@ -2,6 +2,8 @@ import { Request, Response, NextFunction, Router } from "express";
 import { sendAnnouncement } from "../services/announcement.service";
 import { AnnouncementDto, Announcement } from "../models/announcements";
 import { sendAnnouncement as sendDiscordAnnouncement } from "../services/discord.service";
+import { authorizationMiddleware } from "../middleware/authentication";
+import { Role } from "../enums/user.enums";
 
 const router = Router();
 
@@ -39,6 +41,11 @@ const getAnnouncements = async (
 };
 
 //route is /:id
-router.post("/", createAnnouncement);
+router.post(
+  "/",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  createAnnouncement
+);
 router.get("/", getAnnouncements);
 export default router;
