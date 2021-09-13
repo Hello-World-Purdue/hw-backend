@@ -221,7 +221,7 @@ const apply = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({ app });
   } catch (error) {
     logger.error(error);
-    next(new Exception(error));
+    next(new Exception(error.message));
   }
 };
 
