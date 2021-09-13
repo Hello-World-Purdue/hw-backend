@@ -251,6 +251,20 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
       )
     );
   }
+
+  //update query
+  const result = await User.findByIdAndUpdate(
+    id,
+    { rsvp: !user.rsvp },
+    { new: true }
+  ).exec();
+
+  if (result.application) {
+    const app = await Application.findById(result.application).exec();
+    result.application = app;
+  }
+
+  res.status(200).send({ user: result });
 };
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -260,7 +274,40 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
   res.status(200).send();
 };
 
+const changeCase = async (req: Request, res: Response, next: NextFunction) => {
+  const ret = await User.find({});
+  ret.forEach(async (user) => {
+    // console.log("Update: ", user._id, user.email, user.email.toLowerCase());
+    console.log(user.email);
+    if (user.email.toLowerCase() !== user.email) {
+      console.log(
+        "Mismatch: ",
+        user._id,
+        user.email,
+        user.email.toLowerCase(),
+        "Updating"
+      );
+      try {
+        await User.findByIdAndUpdate(user._id, {
+          email: user.email.toLowerCase(),
+        });
+        console.log(
+          "Mismatch updated: ",
+          user._id,
+          user.email,
+          user.email.toLowerCase()
+        );
+      } catch (e) {
+        console.log("Update failed", user._id, user.email, e.message);
+      }
+    }
+  });
+  res.status(200).send();
+};
+
 router.use(logInChecker);
+
+router.get("/changecase", changeCase);
 
 router.get(
   "/",
