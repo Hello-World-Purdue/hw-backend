@@ -27,6 +27,7 @@ const signUp = async (
   const userData = req.body;
   const password = userData.password;
   const passwordConfirm = userData.passwordConfirm;
+  userData.email = `${userData.email}`.toLowerCase();
   // logger.info(`Sign up request from user ${JSON.stringify(userData)}`);
   if (!password || password.length < 5)
     return next(
@@ -87,7 +88,10 @@ const signUp = async (
 const login = async (req: Request, res: Response, next: NextFunction) => {
   const body: { email: string; password: string } = req.body;
   const { email, password } = body;
-  const user = await User.findOne({ email }, "+password").exec();
+  const user = await User.findOne(
+    { email: `${email}`.toLowerCase() },
+    "+password"
+  ).exec();
   if (!user)
     return next(new NotFoundException("User not found, login failed!"));
 
@@ -127,7 +131,7 @@ const forgot = async (req: Request, res: Response, next: NextFunction) => {
   //TODO: put regex for checking valid emails
   if (!email)
     return next(new BadRequestException("Please provide a valid email"));
-  const user = await User.findOne({ email }).exec();
+  const user = await User.findOne({ email: `${email}`.toLowerCase() }).exec();
   if (!user)
     return next(
       new BadRequestException(`There is no user with the email: ${email}`)
@@ -138,9 +142,9 @@ const forgot = async (req: Request, res: Response, next: NextFunction) => {
   user.resetPasswordToken = token;
   await user.save();
   await sendResetEmail(user);
-  res
-    .status(200)
-    .json({ msg: `A link to reset your password has been sent to: ${email}` });
+  res.status(200).json({
+    msg: `A link to reset your password has been sent to: ${email.toLowerCase()}`,
+  });
 };
 
 const reset = async (req: Request, res: Response, next: NextFunction) => {
