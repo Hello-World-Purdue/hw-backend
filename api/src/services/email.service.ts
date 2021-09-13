@@ -91,7 +91,8 @@ export const sendErrorEmail = (error: Error): any => {
 };
 
 export const sendAcceptanceEmails = (users: UserDto[]) => {
-  return sendMassEmail(" d-16c940dfa59c40e7895d2cd96649fb09", users);
+  // return sendMassEmail(" d-16c940dfa59c40e7895d2cd96649fb09", users);
+  return sendEmails("d-16c940dfa59c40e7895d2cd96649fb09", users);
 };
 
 export const sendRejectedEmails = (users: UserDto[]) => {
@@ -108,13 +109,16 @@ const sendMassEmail = (templateId: string, users: UserDto[]) => {
       templateId: templateId,
       from: `${CONFIG.EMAIL}`,
       personalizations: users.map((user) => ({
-        to: user.email,
-        // eslint-disable-next-line
+        to: [
+          {
+            email: user.email,
+          },
+        ],
         dynamic_template_data: {
           name: user.name,
         },
       })),
-      isMultiple: true,
+      // isMultiple: true,
       mailSettings: {
         sandboxMode: {
           enable: CONFIG.NODE_ENV === "test",
@@ -123,6 +127,37 @@ const sendMassEmail = (templateId: string, users: UserDto[]) => {
     });
 };
 
+const sendEmails = async (templateId: string, users: UserDto[]) => {
+  if (users.length) {
+    try {
+      users.forEach(async (user) => {
+        await sendGrid.send({
+          templateId: templateId,
+          from: `${CONFIG.EMAIL}`,
+          personalizations: [
+            {
+              to: [
+                {
+                  email: user.email,
+                },
+              ],
+              dynamic_template_data: {
+                name: user.name,
+              },
+            },
+          ],
+          mailSettings: {
+            sandboxMode: {
+              enable: CONFIG.NODE_ENV === "test",
+            },
+          },
+        } as any);
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
 export const sendTestMail = async (user: IUserModel): Promise<any> => {
   const url =
     CONFIG.NODE_ENV !== "production"

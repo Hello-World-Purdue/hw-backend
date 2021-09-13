@@ -19,6 +19,7 @@ import { ApplicationsStatus } from "../enums/globals.enums";
 import { uploadToStorage } from "../services/storage.service";
 import logger from "../util/logger";
 import multer from "multer";
+import { sendAcceptanceEmails } from "../services/email.service";
 
 const router = Router();
 
@@ -250,20 +251,13 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
       )
     );
   }
+};
 
-  //update query
-  const result = await User.findByIdAndUpdate(
-    id,
-    { rsvp: !user.rsvp },
-    { new: true }
-  ).exec();
-
-  if (result.application) {
-    const app = await Application.findById(result.application).exec();
-    result.application = app;
-  }
-
-  res.status(200).send({ user: result });
+const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
+  const { users } = req.body;
+  const ret = await User.find({ email: { $in: users } });
+  sendAcceptanceEmails(ret);
+  res.status(200).send();
 };
 
 router.use(logInChecker);
@@ -273,6 +267,13 @@ router.get(
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
   getAll
+);
+
+router.post(
+  "/accept",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  acceptUsers
 );
 
 router.get(
