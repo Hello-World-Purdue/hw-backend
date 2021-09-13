@@ -27,7 +27,7 @@ const signUp = async (
   const userData = req.body;
   const password = userData.password;
   const passwordConfirm = userData.passwordConfirm;
-  logger.info(`Sign up request from user ${JSON.stringify(userData)}`);
+  // logger.info(`Sign up request from user ${JSON.stringify(userData)}`);
   if (!password || password.length < 5)
     return next(
       new BadRequestException("Password should be larger than 5 characters")
