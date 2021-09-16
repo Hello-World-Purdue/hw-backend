@@ -96,11 +96,13 @@ export const sendAcceptanceEmails = (users: UserDto[]) => {
 };
 
 export const sendRejectedEmails = (users: UserDto[]) => {
-  return sendMassEmail("d-f67f79d3cf8d4796a1dfe83415245cbf", users);
+  // return sendMassEmail("d-f67f79d3cf8d4796a1dfe83415245cbf", users);
+  return sendEmails("d-f67f79d3cf8d4796a1dfe83415245cbf", users);
 };
 
 export const sendWaitlistedEmails = (users: UserDto[]) => {
-  return sendMassEmail("d-036f9306ee4c40dbbbf1d6436a951713", users);
+  // return sendMassEmail("d-036f9306ee4c40dbbbf1d6436a951713", users);
+  return sendEmails("d-036f9306ee4c40dbbbf1d6436a951713", users);
 };
 
 const sendMassEmail = (templateId: string, users: UserDto[]) => {

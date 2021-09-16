@@ -8,6 +8,7 @@ import {
   logInChecker,
 } from "../middleware/authentication";
 import { Role } from "../enums/user.enums";
+import { Status } from "../enums/app.enums";
 import { hasPermission, userMatches } from "../util";
 import Exception, {
   BadRequestException,
@@ -19,7 +20,11 @@ import { ApplicationsStatus } from "../enums/globals.enums";
 import { uploadToStorage } from "../services/storage.service";
 import logger from "../util/logger";
 import multer from "multer";
-import { sendAcceptanceEmails } from "../services/email.service";
+import {
+  sendAcceptanceEmails,
+  sendRejectedEmails,
+  sendWaitlistedEmails,
+} from "../services/email.service";
 
 const router = Router();
 
@@ -270,8 +275,83 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
   const { users } = req.body;
   const ret = await User.find({ email: { $in: users } });
-  sendAcceptanceEmails(ret);
-  res.status(200).send();
+  const appIds = ret.map((user) => {
+    return user.application;
+  });
+  try {
+    console.log(appIds);
+    const updated = await Application.updateMany(
+      { _id: { $in: appIds } },
+      { statusPublic: Status.ACCEPTED },
+      { new: true }
+    );
+    const updatedUsers = await User.find({ email: { $in: users } }).populate(
+      "application"
+    );
+    const accepted = updatedUsers.filter((user) => {
+      return user.application?.statusPublic == Status.ACCEPTED;
+    });
+    sendAcceptanceEmails(accepted);
+    res.status(200).send({ users: accepted, numUsers: accepted.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+};
+
+const rejectUsers = async (req: Request, res: Response, next: NextFunction) => {
+  const { users } = req.body;
+  const ret = await User.find({ email: { $in: users } });
+  const appIds = ret.map((user) => {
+    return user.application;
+  });
+  try {
+    console.log(appIds);
+    const updated = await Application.updateMany(
+      { _id: { $in: appIds } },
+      { statusPublic: Status.REJECTED },
+      { new: true }
+    );
+    const updatedUsers = await User.find({ email: { $in: users } }).populate(
+      "application"
+    );
+    const accepted = updatedUsers.filter((user) => {
+      return user.application?.statusPublic == Status.REJECTED;
+    });
+    sendRejectedEmails(accepted);
+    res.status(200).send({ users: accepted, numUsers: accepted.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+};
+
+const waitlistUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { users } = req.body;
+  const ret = await User.find({ email: { $in: users } });
+  const appIds = ret.map((user) => {
+    return user.application;
+  });
+  try {
+    console.log(appIds);
+    const updated = await Application.updateMany(
+      { _id: { $in: appIds } },
+      { statusPublic: Status.WAITLIST },
+      { new: true }
+    );
+    const updatedUsers = await User.find({ email: { $in: users } }).populate(
+      "application"
+    );
+    const accepted = updatedUsers.filter((user) => {
+      return user.application?.statusPublic == Status.WAITLIST;
+    });
+    sendWaitlistedEmails(accepted);
+    res.status(200).send({ users: accepted, numUsers: accepted.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
 };
 
 const changeCase = async (req: Request, res: Response, next: NextFunction) => {
@@ -321,6 +401,20 @@ router.post(
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
   acceptUsers
+);
+
+router.post(
+  "/reject",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  rejectUsers
+);
+
+router.post(
+  "/waitlist",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  waitlistUsers
 );
 
 router.get(
