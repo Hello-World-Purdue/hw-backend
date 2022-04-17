@@ -47,7 +47,7 @@ const signUp = async (
 
   if (checkAlreadyRegistered)
     return next(
-      new BadRequestException("An accound already exists with that email!")
+      new BadRequestException("An account already exists with that email!")
     );
 
   delete userData.passwordConfirm;

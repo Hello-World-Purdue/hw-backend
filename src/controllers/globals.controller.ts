@@ -14,7 +14,6 @@ const getGlobals = async (req: Request, res: Response, next: NextFunction) => {
   const globals: IGlobalsModel = await getGlobalValues();
   res.status(200).json({ globals });
 };
-
 export const getGlobalValues = async (): Promise<IGlobalsModel> => {
   return await Globals.findOneAndUpdate(
     {},
