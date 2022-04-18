@@ -20,6 +20,7 @@ const serverRuntimeConfig = {
   GC_BUCKET: env.GC_BUCKET || "mybucket",
   GC_PROJECT_ID: env.GC_PROJECT_ID || "myprojectid",
   GC_KEY_FILE: env.GC_KEY_FILE || "helloworldkey.json",
+  GC_KEY: env.GC_KEY || "null",
   ORG_NAME: env.ORG_NAME || "Hello World",
   SECRET: env.SECRET || "my-secret",
   SENDGRID_KEY: env.SENDGRID_KEY || "mysendgridkey",

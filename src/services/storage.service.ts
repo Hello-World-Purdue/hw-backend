@@ -3,9 +3,14 @@ import { Storage } from "@google-cloud/storage";
 import { UserDto } from "../models/User";
 import { BadRequestException } from "../util/exceptions";
 
+// const storage = new Storage({
+//   projectId: CONFIG.GC_PROJECT_ID,
+//   keyFilename: CONFIG.GC_KEY_FILE,
+// });
+
 const storage = new Storage({
   projectId: CONFIG.GC_PROJECT_ID,
-  keyFilename: CONFIG.GC_KEY_FILE,
+  credentials: JSON.parse(CONFIG.GC_KEY),
 });
 
 const bucket = storage.bucket(CONFIG.GC_BUCKET);
