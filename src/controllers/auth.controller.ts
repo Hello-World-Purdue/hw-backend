@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { application, NextFunction, Request, Response, Router } from "express";
 import logger from "../util/logger";
 import { User } from "../models/User";
 import { extractToken, signToken } from "../util";
 import * as jwt from "jsonwebtoken";
+import { Application, ApplicationDto } from "../models/application";
 import {
   BadRequestException,
   NotFoundException,
@@ -26,7 +27,8 @@ const signUp = async (
   const userData = req.body;
   const password = userData.password;
   const passwordConfirm = userData.passwordConfirm;
-  logger.info(`Sign up request from user ${JSON.stringify(userData)}`);
+  userData.email = `${userData.email}`.toLowerCase();
+  // logger.info(`Sign up request from user ${JSON.stringify(userData)}`);
   if (!password || password.length < 5)
     return next(
       new BadRequestException("Password should be larger than 5 characters")
@@ -47,7 +49,7 @@ const signUp = async (
 
   if (checkAlreadyRegistered)
     return next(
-      new BadRequestException("An account already exists with that email!")
+      new BadRequestException("An accound already exists with that email!")
     );
 
   delete userData.passwordConfirm;
@@ -58,6 +60,13 @@ const signUp = async (
     const userJson: any = user.toJSON();
     delete userJson.password;
     const token = signToken(userJson);
+
+    //remove later
+    const resetToken = jwt.sign({ id: user._id }, CONFIG.SECRET, {
+      expiresIn: "2 days",
+    });
+    user.resetPasswordToken = resetToken;
+    await user.save();
 
     logger.info("User has successfully signed up", user);
     try {
@@ -79,7 +88,10 @@ const signUp = async (
 const login = async (req: Request, res: Response, next: NextFunction) => {
   const body: { email: string; password: string } = req.body;
   const { email, password } = body;
-  const user = await User.findOne({ email }, "+password").exec();
+  const user = await User.findOne(
+    { email: `${email}`.toLowerCase() },
+    "+password"
+  ).exec();
   if (!user)
     return next(new NotFoundException("User not found, login failed!"));
 
@@ -88,6 +100,11 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
   const userJson: any = user.toJSON();
   delete userJson.password;
+
+  if (userJson.application) {
+    const app = await Application.findById(userJson.application).exec();
+    userJson.application = app;
+  }
 
   const token = signToken(userJson);
   res.status(200).json({
@@ -114,18 +131,20 @@ const forgot = async (req: Request, res: Response, next: NextFunction) => {
   //TODO: put regex for checking valid emails
   if (!email)
     return next(new BadRequestException("Please provide a valid email"));
-  const user = await User.findOne({ email }).exec();
+  const user = await User.findOne({ email: `${email}`.toLowerCase() }).exec();
   if (!user)
-    next(new BadRequestException(`There is no user with the email: ${email}`));
+    return next(
+      new BadRequestException(`There is no user with the email: ${email}`)
+    );
   const token = jwt.sign({ id: user._id }, CONFIG.SECRET, {
     expiresIn: "2 days",
   });
   user.resetPasswordToken = token;
   await user.save();
   await sendResetEmail(user);
-  res
-    .status(200)
-    .json({ msg: `A link to reset your password has been sent to: ${email}` });
+  res.status(200).json({
+    msg: `A link to reset your password has been sent to: ${email.toLowerCase()}`,
+  });
 };
 
 const reset = async (req: Request, res: Response, next: NextFunction) => {
@@ -135,9 +154,9 @@ const reset = async (req: Request, res: Response, next: NextFunction) => {
       new BadRequestException("A password longer than 5 characters is required")
     );
   if (!passwordConfirm)
-    next(new BadRequestException("Please confirm your password"));
+    return next(new BadRequestException("Please confirm your password"));
   if (passwordConfirm !== password)
-    next(new BadRequestException("Passwords did not match"));
+    return next(new BadRequestException("Passwords did not match"));
 
   if (!token)
     return next(new UnauthorizedException("Invalid reset password token"));
@@ -151,24 +170,28 @@ const reset = async (req: Request, res: Response, next: NextFunction) => {
     return next(new UnauthorizedException("Invalid reset password token"));
   const { id } = payload;
   if (!id || !isValidObjectId(id))
-    next(
+    return next(
       new BadRequestException(
         "Reset password token corresponds to an invalid user"
       )
     );
   const user = await User.findById(id).select("+resetPasswordToken").exec();
   if (!user)
-    next(
+    return next(
       new BadRequestException(
         "Reset password token corresponds to a non existing user"
       )
     );
-  if (user.resetPasswordToken !== token)
-    next(new UnauthorizedException("Wrong reset password token for this user"));
+  if (`${user.resetPasswordToken}`.localeCompare(`${token}`) !== 0)
+    return next(
+      new UnauthorizedException("Wrong reset password token for this user")
+    );
   user.password = password;
   user.resetPasswordToken = "";
   await user.save();
-  return `Successfully changed password for: ${user.name}`;
+  res
+    .status(200)
+    .json({ user, message: `Successfully changed password for: ${user.name}` });
 };
 
 router.post("/signup", signUp);

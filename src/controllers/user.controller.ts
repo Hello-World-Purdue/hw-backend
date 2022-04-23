@@ -8,6 +8,7 @@ import {
   logInChecker,
 } from "../middleware/authentication";
 import { Role } from "../enums/user.enums";
+import { Status } from "../enums/app.enums";
 import { hasPermission, userMatches } from "../util";
 import Exception, {
   BadRequestException,
@@ -19,6 +20,11 @@ import { ApplicationsStatus } from "../enums/globals.enums";
 import { uploadToStorage } from "../services/storage.service";
 import logger from "../util/logger";
 import multer from "multer";
+import {
+  sendAcceptanceEmails,
+  sendRejectedEmails,
+  sendWaitlistedEmails,
+} from "../services/email.service";
 
 const router = Router();
 
@@ -221,17 +227,194 @@ const apply = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({ app });
   } catch (error) {
     logger.error(error);
-    next(new Exception(error));
+    next(new Exception(error.message));
   }
 };
 
+const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id;
+  const currentUser: any = req.user;
+
+  if (!isValidObjectId(id)) {
+    //return error: invalid user id
+    return next(new BadRequestException("The user id is invalid!"));
+  }
+  const user = await User.findById(id).exec();
+  if (!user) {
+    //return error: User not found
+    return next(new NotFoundException("The user is not found!"));
+  }
+
+  if (
+    !hasPermission(currentUser, Role.EXEC) &&
+    `${id}` !== `${currentUser._id}`
+  ) {
+    //return error: Unauthorized to edit the profile
+    return next(
+      new UnauthorizedException(
+        "You don't have enough permissions to edit this profile"
+      )
+    );
+  }
+
+  //update query
+  const result = await User.findByIdAndUpdate(
+    id,
+    { rsvp: !user.rsvp },
+    { new: true }
+  ).exec();
+
+  if (result.application) {
+    const app = await Application.findById(result.application).exec();
+    result.application = app;
+  }
+
+  res.status(200).send({ user: result });
+};
+
+const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
+  const { users } = req.body;
+  const ret = await User.find({ email: { $in: users } });
+  const appIds = ret.map((user) => {
+    return user.application;
+  });
+  try {
+    console.log(appIds);
+    const updated = await Application.updateMany(
+      { _id: { $in: appIds } },
+      { statusPublic: Status.ACCEPTED },
+      { new: true }
+    );
+    const updatedUsers = await User.find({ email: { $in: users } }).populate(
+      "application"
+    );
+    const accepted = updatedUsers.filter((user) => {
+      return user.application?.statusPublic == Status.ACCEPTED;
+    });
+    sendAcceptanceEmails(accepted);
+    res.status(200).send({ users: accepted, numUsers: accepted.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+};
+
+const rejectUsers = async (req: Request, res: Response, next: NextFunction) => {
+  const { users } = req.body;
+  const ret = await User.find({ email: { $in: users } });
+  const appIds = ret.map((user) => {
+    return user.application;
+  });
+  try {
+    console.log(appIds);
+    const updated = await Application.updateMany(
+      { _id: { $in: appIds } },
+      { statusPublic: Status.REJECTED },
+      { new: true }
+    );
+    const updatedUsers = await User.find({ email: { $in: users } }).populate(
+      "application"
+    );
+    const accepted = updatedUsers.filter((user) => {
+      return user.application?.statusPublic == Status.REJECTED;
+    });
+    sendRejectedEmails(accepted);
+    res.status(200).send({ users: accepted, numUsers: accepted.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+};
+
+const waitlistUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { users } = req.body;
+  const ret = await User.find({ email: { $in: users } });
+  const appIds = ret.map((user) => {
+    return user.application;
+  });
+  try {
+    console.log(appIds);
+    const updated = await Application.updateMany(
+      { _id: { $in: appIds } },
+      { statusPublic: Status.WAITLIST },
+      { new: true }
+    );
+    const updatedUsers = await User.find({ email: { $in: users } }).populate(
+      "application"
+    );
+    const accepted = updatedUsers.filter((user) => {
+      return user.application?.statusPublic == Status.WAITLIST;
+    });
+    sendWaitlistedEmails(accepted);
+    res.status(200).send({ users: accepted, numUsers: accepted.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+};
+
+const changeCase = async (req: Request, res: Response, next: NextFunction) => {
+  const ret = await User.find({});
+  ret.forEach(async (user) => {
+    // console.log("Update: ", user._id, user.email, user.email.toLowerCase());
+    console.log(user.email);
+    if (user.email.toLowerCase() !== user.email) {
+      console.log(
+        "Mismatch: ",
+        user._id,
+        user.email,
+        user.email.toLowerCase(),
+        "Updating"
+      );
+      try {
+        await User.findByIdAndUpdate(user._id, {
+          email: user.email.toLowerCase(),
+        });
+        console.log(
+          "Mismatch updated: ",
+          user._id,
+          user.email,
+          user.email.toLowerCase()
+        );
+      } catch (e) {
+        console.log("Update failed", user._id, user.email, e.message);
+      }
+    }
+  });
+  res.status(200).send();
+};
+
 router.use(logInChecker);
+
+router.get("/changecase", changeCase);
 
 router.get(
   "/",
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
   getAll
+);
+
+router.post(
+  "/accept",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  acceptUsers
+);
+
+router.post(
+  "/reject",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  rejectUsers
+);
+
+router.post(
+  "/waitlist",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  waitlistUsers
 );
 
 router.get(
@@ -269,5 +452,12 @@ router.post(
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, []),
   apply
+);
+
+router.post(
+  "/:id/rsvp",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, []),
+  rsvpUser
 );
 export default router;

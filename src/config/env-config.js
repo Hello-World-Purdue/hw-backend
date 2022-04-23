@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const env = process.env;
 
 const sharedConfig = {
-  PORT: env.PORT || 5000,
+  PORT: env.PORT || 5004,
   NODE_ENV: env.NODE_ENV || "development",
   TRACKING_ID: env.TRACKING_ID || "my-google-analytics-key",
   VAPID_PUBLIC: env.VAPID_PUBLIC || "my vapid public key",
@@ -14,13 +14,13 @@ const sharedConfig = {
 };
 
 const serverRuntimeConfig = {
+  BASE_URL: env.BASE_URL || "https://helloworldpurdue.com",
   MONGODB_URI: env.MONGODB_URI || "mongodb://0.0.0.0:27017/HelloWorld",
   EMAIL: env.EMAIL || "my@email.com",
   EXPIRES_IN: env.EXPIRES_IN || "7 days",
   GC_BUCKET: env.GC_BUCKET || "mybucket",
   GC_PROJECT_ID: env.GC_PROJECT_ID || "myprojectid",
   GC_KEY_FILE: env.GC_KEY_FILE || "helloworldkey.json",
-  GC_KEY: env.GC_KEY || "null",
   ORG_NAME: env.ORG_NAME || "Hello World",
   SECRET: env.SECRET || "my-secret",
   SENDGRID_KEY: env.SENDGRID_KEY || "mysendgridkey",

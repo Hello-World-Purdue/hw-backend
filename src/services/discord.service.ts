@@ -14,5 +14,8 @@ const hook = new Discord.WebhookClient(
 
 // Send a message using the webhook
 export const sendAnnouncement = (announcement: string): void => {
-  hook.send(announcement);
+  hook
+    .send(announcement)
+    .then((msg) => console.log("Message sent on discord:", msg.content))
+    .catch((e) => console.error("Discord Error:", e));
 };

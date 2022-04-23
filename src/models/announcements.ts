@@ -17,7 +17,7 @@ export class AnnouncementDto {
     message: "Please provide a valid announcement label",
     each: true,
   })
-  labels: AnnouncementLabel[];
+  label: AnnouncementLabel[];
 }
 
 export interface IAnnouncementModel extends AnnouncementDto, Document {
@@ -31,7 +31,7 @@ const schema = new Schema(
   {
     title: { type: String, required: true },
     body: { type: String, required: true },
-    labels: { type: [String], required: true },
+    label: { type: String, required: true },
     released: { type: Boolean, default: false },
     slackTS: { type: String, default: "" },
   },
