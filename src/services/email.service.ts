@@ -13,7 +13,7 @@ export const sendResetEmail = async (user: IUserModel): Promise<any> => {
 
   try {
     await sendGrid.send({
-      templateId: "d-54f38bb5543141f39ea71490d2528ddd",
+      templateId: "d-d36d0f6625684ce0bcd802c3e0411554",
       from: `${CONFIG.EMAIL}`,
       personalizations: [
         {
@@ -24,7 +24,7 @@ export const sendResetEmail = async (user: IUserModel): Promise<any> => {
           ],
           dynamic_template_data: {
             name: user.name,
-            url: `${url}/auth/reset?token=${user.resetPasswordToken}`,
+            url: `${url}/reset?token=${user.resetPasswordToken}`,
             token: user.resetPasswordToken,
           },
         },
@@ -44,7 +44,7 @@ export const sendAccountCreatedEmail = (user: IUserModel): any => {
   const url = config.BASE_URL;
 
   return sendGrid.send({
-    templateId: "d-6b46dc0eb7914b8db689a7952ce11d91",
+    templateId: "d-e590e56fcab347428537618d728aee42",
     from: `${CONFIG.EMAIL}`,
     personalizations: [
       {
