@@ -273,33 +273,32 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
-  const body: { users: any[] } = req.body;
-  const { users } = body;
-  res.status(200).send({ users: users, numUsers: users.length });
+  const { users } = req.body;
+  logger.info("users " + users);
   // const ret = await User.find({ email: { $in: users } });
   // const appIds = ret.map((user) => {
   //   return user.application;
   // });
-  // try {
-  //   // console.log(appIds);
-  //   // const updated = await Application.updateMany(
-  //   //   { _id: { $in: appIds } },
-  //   //   { statusPublic: Status.ACCEPTED },
-  //   //   { new: true }
-  //   // );
-  //   // const updatedUsers = await User.find({ email: { $in: users } }).populate(
-  //   //   "application"
-  //   // );
-  //   // const accepted = updatedUsers.filter((user) => {
-  //   //   return user.application?.statusPublic == Status.ACCEPTED;
-  //   // });
-  //   // sendAcceptanceEmails(accepted);
-  //   // res.status(200).send({ users: accepted, numUsers: accepted.length });
-  //   // sendAcceptanceEmails(users);
-  //   res.status(200).send({ users: users, numUsers: users.length });
-  // } catch (e) {
-  //   res.status(400).json({ message: e.message });
-  // }
+  try {
+    // console.log(appIds);
+    // const updated = await Application.updateMany(
+    //   { _id: { $in: appIds } },
+    //   { statusPublic: Status.ACCEPTED },
+    //   { new: true }
+    // );
+    // const updatedUsers = await User.find({ email: { $in: users } }).populate(
+    //   "application"
+    // );
+    // const accepted = updatedUsers.filter((user) => {
+    //   return user.application?.statusPublic == Status.ACCEPTED;
+    // });
+    // sendAcceptanceEmails(accepted);
+    // res.status(200).send({ users: accepted, numUsers: accepted.length });
+    // sendAcceptanceEmails(users);
+    // res.status(200).send({ users: users, numUsers: users.length });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
 };
 
 const rejectUsers = async (req: Request, res: Response, next: NextFunction) => {
