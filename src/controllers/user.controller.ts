@@ -274,6 +274,7 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
   const { users } = req.body;
+  console.log(users);
   // const ret = await User.find({ email: { $in: users } });
   // const appIds = ret.map((user) => {
   //   return user.application;
@@ -293,8 +294,8 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
     // });
     // sendAcceptanceEmails(accepted);
     // res.status(200).send({ users: accepted, numUsers: accepted.length });
-    sendAcceptanceEmails(users);
-    res.status(200).send({ users, numUsers: users.length });
+    // sendAcceptanceEmails(users);
+    res.status(200).send({ users: users, numUsers: users.length });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
