@@ -274,25 +274,27 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
   const { users } = req.body;
-  const ret = await User.find({ email: { $in: users } });
-  const appIds = ret.map((user) => {
-    return user.application;
-  });
+  // const ret = await User.find({ email: { $in: users } });
+  // const appIds = ret.map((user) => {
+  //   return user.application;
+  // });
   try {
-    console.log(appIds);
-    const updated = await Application.updateMany(
-      { _id: { $in: appIds } },
-      { statusPublic: Status.ACCEPTED },
-      { new: true }
-    );
-    const updatedUsers = await User.find({ email: { $in: users } }).populate(
-      "application"
-    );
-    const accepted = updatedUsers.filter((user) => {
-      return user.application?.statusPublic == Status.ACCEPTED;
-    });
-    sendAcceptanceEmails(accepted);
-    res.status(200).send({ users: accepted, numUsers: accepted.length });
+    // console.log(appIds);
+    // const updated = await Application.updateMany(
+    //   { _id: { $in: appIds } },
+    //   { statusPublic: Status.ACCEPTED },
+    //   { new: true }
+    // );
+    // const updatedUsers = await User.find({ email: { $in: users } }).populate(
+    //   "application"
+    // );
+    // const accepted = updatedUsers.filter((user) => {
+    //   return user.application?.statusPublic == Status.ACCEPTED;
+    // });
+    // sendAcceptanceEmails(accepted);
+    // res.status(200).send({ users: accepted, numUsers: accepted.length });
+    sendAcceptanceEmails(users);
+    res.status(200).send({ users, numUsers: users.length });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
@@ -387,6 +389,13 @@ const changeCase = async (req: Request, res: Response, next: NextFunction) => {
 
 router.use(logInChecker);
 
+router.post(
+  "/accept",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
+  acceptUsers
+);
+
 router.get("/changecase", changeCase);
 
 router.get(
@@ -394,13 +403,6 @@ router.get(
   (req: Request, res: Response, next: NextFunction) =>
     authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
   getAll
-);
-
-router.post(
-  "/accept",
-  (req: Request, res: Response, next: NextFunction) =>
-    authorizationMiddleware(req, res, next, [Role.ADMIN, Role.EXEC]),
-  acceptUsers
 );
 
 router.post(
