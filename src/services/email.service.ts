@@ -90,7 +90,7 @@ export const sendErrorEmail = (error: Error): any => {
   } as any);
 };
 
-export const sendAcceptanceEmails = (users: UserDto[]) => {
+export const sendAcceptanceEmails = (users: any[]) => {
   // return sendMassEmail(" d-16c940dfa59c40e7895d2cd96649fb09", users);
   return sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
 };
@@ -129,8 +129,8 @@ const sendMassEmail = (templateId: string, users: UserDto[]) => {
     });
 };
 
-const sendEmails = async (templateId: string, users: UserDto[]) => {
-  if (users.length) {
+const sendEmails = async (templateId: string, users: any[]) => {
+  if (users.length > 0) {
     try {
       users.forEach(async (user) => {
         await sendGrid.send({
