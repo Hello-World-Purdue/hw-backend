@@ -273,7 +273,7 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
-  const { users } = req.body;
+  const users = req.body;
   console.log(users);
   // const ret = await User.find({ email: { $in: users } });
   // const appIds = ret.map((user) => {
