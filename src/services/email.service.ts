@@ -92,7 +92,7 @@ export const sendErrorEmail = (error: Error): any => {
 
 export const sendAcceptanceEmails = (users: UserDto[]) => {
   // return sendMassEmail(" d-16c940dfa59c40e7895d2cd96649fb09", users);
-  return sendEmails("d-16c940dfa59c40e7895d2cd96649fb09", users);
+  return sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
 };
 
 export const sendRejectedEmails = (users: UserDto[]) => {
