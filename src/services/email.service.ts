@@ -1,4 +1,5 @@
 import sendGrid from "@sendgrid/mail";
+import logger from "src/util/logger";
 import config from "../config";
 import CONFIG from "../config";
 import { IUserModel, UserDto } from "../models/User";
@@ -91,6 +92,7 @@ export const sendErrorEmail = (error: Error): any => {
 };
 
 export const sendAcceptanceEmails = (user: any) => {
+  logger.info("user " + user);
   // return sendMassEmail("d-c7abf6b83a0941cb836fa819c7c8325f", users);
   // sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
   return sendGrid.send({
