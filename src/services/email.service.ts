@@ -91,12 +91,13 @@ export const sendErrorEmail = (error: Error): any => {
   } as any);
 };
 
-export const sendAcceptanceEmails = (user: any) => {
-  logger.info("user " + user);
-  // return sendMassEmail("d-c7abf6b83a0941cb836fa819c7c8325f", users);
-  // sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
+export const sendAcceptanceEmails = (users: any[]) => {
+  sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
+};
+
+export const sendAcceptanceEmail = (user: any) => {
   return sendGrid.send({
-    templateId: "d-c7abf6b83a0941cb836fa819c7c8325f",
+    templateId: "d-5209fff35363408cb6493000a57d84c8",
     from: `${CONFIG.EMAIL}`,
     personalizations: [
       {
