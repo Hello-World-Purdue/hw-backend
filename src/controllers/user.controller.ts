@@ -273,8 +273,7 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
-  const body: { users: string[] } = req.body;
-  const { users } = body;
+  // const body: { users: string[] } = req.body;
 
   // const ret = await User.find({ email: { $in: users } });
   // const appIds = ret.map((user) => {
@@ -296,6 +295,7 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
     // sendAcceptanceEmails(accepted);
     // res.status(200).send({ users: accepted, numUsers: accepted.length });
 
+    const users: string[] = req.body.users;
     const acceptedUsers: any[] = [];
 
     users.forEach((str: string) => acceptedUsers.push(JSON.parse(str)));
