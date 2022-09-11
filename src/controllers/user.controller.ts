@@ -273,7 +273,8 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
-  const { users } = req.body;
+  const body: { users: string[] } = req.body;
+  const { users } = body;
 
   const acceptedUsers: any[] = [];
 
