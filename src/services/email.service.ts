@@ -91,8 +91,8 @@ export const sendErrorEmail = (error: Error): any => {
 };
 
 export const sendAcceptanceEmails = (users: any[]) => {
-  // return sendMassEmail(" d-16c940dfa59c40e7895d2cd96649fb09", users);
-  return sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
+  // return sendMassEmail("d-c7abf6b83a0941cb836fa819c7c8325f", users);
+  sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
 };
 
 export const sendRejectedEmails = (users: UserDto[]) => {
@@ -105,7 +105,7 @@ export const sendWaitlistedEmails = (users: UserDto[]) => {
   return sendEmails("d-036f9306ee4c40dbbbf1d6436a951713", users);
 };
 
-const sendMassEmail = (templateId: string, users: UserDto[]) => {
+const sendMassEmail = (templateId: string, users: any[]) => {
   if (users.length)
     return sendGrid.send({
       templateId: templateId,
@@ -129,35 +129,33 @@ const sendMassEmail = (templateId: string, users: UserDto[]) => {
     });
 };
 
-const sendEmails = async (templateId: string, users: any[]) => {
-  if (users.length > 0) {
-    try {
-      users.forEach(async (user) => {
-        await sendGrid.send({
-          templateId: templateId,
-          from: `${CONFIG.EMAIL}`,
-          personalizations: [
-            {
-              to: [
-                {
-                  email: user.email,
-                },
-              ],
-              dynamic_template_data: {
-                name: user.name,
+const sendEmails = async (curTemplateId: string, users: any[]) => {
+  try {
+    users.forEach(async (user) => {
+      await sendGrid.send({
+        templateId: curTemplateId,
+        from: `${CONFIG.EMAIL}`,
+        personalizations: [
+          {
+            to: [
+              {
+                email: user.email,
               },
-            },
-          ],
-          mailSettings: {
-            sandboxMode: {
-              enable: CONFIG.NODE_ENV === "test",
+            ],
+            dynamic_template_data: {
+              name: user.name,
             },
           },
-        } as any);
-      });
-    } catch (e) {
-      console.log(e);
-    }
+        ],
+        mailSettings: {
+          sandboxMode: {
+            enable: CONFIG.NODE_ENV === "test",
+          },
+        },
+      } as any);
+    });
+  } catch (e) {
+    console.log(e);
   }
 };
 export const sendTestMail = async (user: IUserModel): Promise<any> => {
