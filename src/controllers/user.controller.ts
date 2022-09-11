@@ -300,7 +300,7 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
 
     users.forEach((str: string) => acceptedUsers.push(JSON.parse(str)));
 
-    sendAcceptanceEmails(acceptedUsers);
+    await sendAcceptanceEmails(acceptedUsers[0]);
     res
       .status(200)
       .send({ users: acceptedUsers, numUsers: acceptedUsers.length });

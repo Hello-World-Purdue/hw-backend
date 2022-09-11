@@ -90,9 +90,30 @@ export const sendErrorEmail = (error: Error): any => {
   } as any);
 };
 
-export const sendAcceptanceEmails = (users: any[]) => {
+export const sendAcceptanceEmails = (user: any) => {
   // return sendMassEmail("d-c7abf6b83a0941cb836fa819c7c8325f", users);
-  sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
+  // sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
+  return sendGrid.send({
+    templateId: "d-c7abf6b83a0941cb836fa819c7c8325f",
+    from: `${CONFIG.EMAIL}`,
+    personalizations: [
+      {
+        to: [
+          {
+            email: user.email,
+          },
+        ],
+        dynamic_template_data: {
+          name: user.name,
+        },
+      },
+    ],
+    mailSettings: {
+      sandboxMode: {
+        enable: CONFIG.NODE_ENV === "test",
+      },
+    },
+  } as any);
 };
 
 export const sendRejectedEmails = (users: UserDto[]) => {
