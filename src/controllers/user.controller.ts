@@ -25,6 +25,7 @@ import {
   sendAcceptanceEmail,
   sendRejectedEmails,
   sendWaitlistedEmails,
+  sendRejectionEmail,
 } from "../services/email.service";
 
 const router = Router();
@@ -321,26 +322,44 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const rejectUsers = async (req: Request, res: Response, next: NextFunction) => {
-  const { users } = req.body;
-  const ret = await User.find({ email: { $in: users } });
-  const appIds = ret.map((user) => {
-    return user.application;
-  });
+  // const { users } = req.body;
+  // const ret = await User.find({ email: { $in: users } });
+  // const appIds = ret.map((user) => {
+  //   return user.application;
+  // });
   try {
-    console.log(appIds);
-    const updated = await Application.updateMany(
-      { _id: { $in: appIds } },
-      { statusPublic: Status.REJECTED },
-      { new: true }
-    );
-    const updatedUsers = await User.find({ email: { $in: users } }).populate(
-      "application"
-    );
-    const accepted = updatedUsers.filter((user) => {
-      return user.application?.statusPublic == Status.REJECTED;
-    });
-    sendRejectedEmails(accepted);
-    res.status(200).send({ users: accepted, numUsers: accepted.length });
+    // console.log(appIds);
+    // const updated = await Application.updateMany(
+    //   { _id: { $in: appIds } },
+    //   { statusPublic: Status.REJECTED },
+    //   { new: true }
+    // );
+    // const updatedUsers = await User.find({ email: { $in: users } }).populate(
+    //   "application"
+    // );
+    // const accepted = updatedUsers.filter((user) => {
+    //   return user.application?.statusPublic == Status.REJECTED;
+    // });
+    // sendRejectedEmails(accepted);
+    // res.status(200).send({ users: accepted, numUsers: accepted.length });
+
+    const users: string[] = req.body.users;
+    const rejectedUsers: any[] = [];
+
+    users.forEach((str: string) => rejectedUsers.push(JSON.parse(str)));
+
+    try {
+      rejectedUsers.forEach(
+        async (user: any) => await sendRejectionEmail(user)
+      );
+    } catch (e) {
+      console.log(e);
+      logger.info(e);
+    }
+
+    res
+      .status(200)
+      .send({ users: rejectedUsers, numUsers: rejectedUsers.length });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
@@ -351,26 +370,44 @@ const waitlistUsers = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { users } = req.body;
-  const ret = await User.find({ email: { $in: users } });
-  const appIds = ret.map((user) => {
-    return user.application;
-  });
+  // const { users } = req.body;
+  // const ret = await User.find({ email: { $in: users } });
+  // const appIds = ret.map((user) => {
+  //   return user.application;
+  // });
   try {
-    console.log(appIds);
-    const updated = await Application.updateMany(
-      { _id: { $in: appIds } },
-      { statusPublic: Status.WAITLIST },
-      { new: true }
-    );
-    const updatedUsers = await User.find({ email: { $in: users } }).populate(
-      "application"
-    );
-    const accepted = updatedUsers.filter((user) => {
-      return user.application?.statusPublic == Status.WAITLIST;
-    });
-    sendWaitlistedEmails(accepted);
-    res.status(200).send({ users: accepted, numUsers: accepted.length });
+    // console.log(appIds);
+    // const updated = await Application.updateMany(
+    //   { _id: { $in: appIds } },
+    //   { statusPublic: Status.WAITLIST },
+    //   { new: true }
+    // );
+    // const updatedUsers = await User.find({ email: { $in: users } }).populate(
+    //   "application"
+    // );
+    // const accepted = updatedUsers.filter((user) => {
+    //   return user.application?.statusPublic == Status.WAITLIST;
+    // });
+    // sendWaitlistedEmails(accepted);
+    // res.status(200).send({ users: accepted, numUsers: accepted.length });
+
+    const users: string[] = req.body.users;
+    const waitlistedUsers: any[] = [];
+
+    users.forEach((str: string) => waitlistedUsers.push(JSON.parse(str)));
+
+    try {
+      waitlistedUsers.forEach(
+        async (user: any) => await sendRejectionEmail(user)
+      );
+    } catch (e) {
+      console.log(e);
+      logger.info(e);
+    }
+
+    res
+      .status(200)
+      .send({ users: waitlistedUsers, numUsers: waitlistedUsers.length });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }

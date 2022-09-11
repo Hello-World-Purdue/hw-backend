@@ -91,7 +91,7 @@ export const sendErrorEmail = (error: Error): any => {
   } as any);
 };
 
-export const sendAcceptanceEmails = (users: any[]) => {
+export const sendAcceptanceEmails = (users: UserDto[]) => {
   sendEmails("d-c7abf6b83a0941cb836fa819c7c8325f", users);
 };
 
@@ -124,9 +124,56 @@ export const sendRejectedEmails = (users: UserDto[]) => {
   return sendEmails("d-f67f79d3cf8d4796a1dfe83415245cbf", users);
 };
 
+export const sendRejectionEmail = (user: any) => {
+  return sendGrid.send({
+    templateId: "d-5209fff35363408cb6493000a57d84c8",
+    from: `${CONFIG.EMAIL}`,
+    personalizations: [
+      {
+        to: [
+          {
+            email: user.email,
+          },
+        ],
+        dynamic_template_data: {
+          name: user.name,
+        },
+      },
+    ],
+    mailSettings: {
+      sandboxMode: {
+        enable: CONFIG.NODE_ENV === "test",
+      },
+    },
+  } as any);
+};
 export const sendWaitlistedEmails = (users: UserDto[]) => {
   // return sendMassEmail("d-036f9306ee4c40dbbbf1d6436a951713", users);
   return sendEmails("d-036f9306ee4c40dbbbf1d6436a951713", users);
+};
+
+export const sendWaitlistEmail = (user: any) => {
+  return sendGrid.send({
+    templateId: "d-5209fff35363408cb6493000a57d84c8",
+    from: `${CONFIG.EMAIL}`,
+    personalizations: [
+      {
+        to: [
+          {
+            email: user.email,
+          },
+        ],
+        dynamic_template_data: {
+          name: user.name,
+        },
+      },
+    ],
+    mailSettings: {
+      sandboxMode: {
+        enable: CONFIG.NODE_ENV === "test",
+      },
+    },
+  } as any);
 };
 
 const sendMassEmail = (templateId: string, users: any[]) => {
