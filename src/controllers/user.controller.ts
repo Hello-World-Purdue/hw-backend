@@ -25,6 +25,7 @@ import {
   sendAcceptanceEmail,
   sendRejectedEmails,
   sendWaitlistedEmails,
+  sendAccountCreatedEmail,
 } from "../services/email.service";
 
 const router = Router();
@@ -305,7 +306,7 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
       acceptedUsers.forEach(
-        async (user: any) => await sendAcceptanceEmail(user)
+        async (user: any) => await sendAccountCreatedEmail(user)
       );
     } catch (e) {
       console.log(e);
