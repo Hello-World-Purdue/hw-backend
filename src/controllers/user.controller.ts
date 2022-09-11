@@ -276,9 +276,6 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
   const body: { users: string[] } = req.body;
   const { users } = body;
 
-  const acceptedUsers: any[] = [];
-
-  users.forEach((str: string) => acceptedUsers.push(JSON.parse(str)));
   // const ret = await User.find({ email: { $in: users } });
   // const appIds = ret.map((user) => {
   //   return user.application;
@@ -298,6 +295,11 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
     // });
     // sendAcceptanceEmails(accepted);
     // res.status(200).send({ users: accepted, numUsers: accepted.length });
+
+    const acceptedUsers: any[] = [];
+
+    users.forEach((str: string) => acceptedUsers.push(JSON.parse(str)));
+
     sendAcceptanceEmails(acceptedUsers);
     res
       .status(200)
