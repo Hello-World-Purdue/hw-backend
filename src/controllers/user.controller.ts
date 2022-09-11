@@ -22,6 +22,7 @@ import logger from "../util/logger";
 import multer from "multer";
 import {
   sendAcceptanceEmails,
+  sendAccountCreatedEmail,
   sendRejectedEmails,
   sendWaitlistedEmails,
 } from "../services/email.service";
@@ -300,7 +301,15 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
 
     users.forEach((str: string) => acceptedUsers.push(JSON.parse(str)));
 
-    await sendAcceptanceEmails(acceptedUsers[0]);
+    // await sendAcceptanceEmails(acceptedUsers[0]);
+
+    try {
+      await sendAccountCreatedEmail(acceptedUsers[0]);
+    } catch (e) {
+      console.log(e);
+      logger.info(e);
+    }
+
     res
       .status(200)
       .send({ users: acceptedUsers, numUsers: acceptedUsers.length });
