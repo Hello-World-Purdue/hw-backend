@@ -1,5 +1,5 @@
 import sendGrid from "@sendgrid/mail";
-import logger from "src/util/logger";
+import logger from "../util/logger";
 import config from "../config";
 import CONFIG from "../config";
 import { IUserModel, UserDto } from "../models/User";
