@@ -126,7 +126,7 @@ export const sendRejectedEmails = (users: UserDto[]) => {
 
 export const sendRejectionEmail = (user: any) => {
   return sendGrid.send({
-    templateId: "d-5209fff35363408cb6493000a57d84c8",
+    templateId: "d-0253b74e2af349baab14c5116e6e5986",
     from: `${CONFIG.EMAIL}`,
     personalizations: [
       {
@@ -154,7 +154,7 @@ export const sendWaitlistedEmails = (users: UserDto[]) => {
 
 export const sendWaitlistEmail = (user: any) => {
   return sendGrid.send({
-    templateId: "d-5209fff35363408cb6493000a57d84c8",
+    templateId: "d-2fa9d1add7dc43ee97f8af614a8ab99a",
     from: `${CONFIG.EMAIL}`,
     personalizations: [
       {
