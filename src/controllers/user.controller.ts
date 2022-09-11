@@ -26,6 +26,7 @@ import {
   sendRejectedEmails,
   sendWaitlistedEmails,
   sendRejectionEmail,
+  sendWaitlistEmail,
 } from "../services/email.service";
 
 const router = Router();
@@ -398,7 +399,7 @@ const waitlistUsers = async (
 
     try {
       waitlistedUsers.forEach(
-        async (user: any) => await sendRejectionEmail(user)
+        async (user: any) => await sendWaitlistEmail(user)
       );
     } catch (e) {
       console.log(e);
