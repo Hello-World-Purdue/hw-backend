@@ -297,7 +297,7 @@ const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
     // });
     // sendAcceptanceEmails(accepted);
     // res.status(200).send({ users: accepted, numUsers: accepted.length });
-    // sendAcceptanceEmails(users);
+    sendAcceptanceEmails(users);
     res
       .status(200)
       .send({ users: acceptedUsers, numUsers: acceptedUsers.length });
