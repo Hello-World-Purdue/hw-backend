@@ -275,6 +275,47 @@ const rsvpUser = async (req: Request, res: Response, next: NextFunction) => {
   res.status(200).send({ user: result });
 };
 
+const checkinUser = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id;
+  const currentUser: any = req.user;
+
+  if (!isValidObjectId(id)) {
+    //return error: invalid user id
+    return next(new BadRequestException("The user id is invalid!"));
+  }
+  const user = await User.findById(id).exec();
+  if (!user) {
+    //return error: User not found
+    return next(new NotFoundException("The user is not found!"));
+  }
+
+  if (
+    !hasPermission(currentUser, Role.EXEC) &&
+    `${id}` !== `${currentUser._id}`
+  ) {
+    //return error: Unauthorized to edit the profile
+    return next(
+      new UnauthorizedException(
+        "You don't have enough permissions to edit this profile"
+      )
+    );
+  }
+
+  //update query
+  const result = await User.findByIdAndUpdate(
+    id,
+    { checkedin: true },
+    { new: true }
+  ).exec();
+
+  if (result.application) {
+    const app = await Application.findById(result.application).exec();
+    result.application = app;
+  }
+
+  res.status(200).send({ user: result });
+};
+
 const acceptUsers = async (req: Request, res: Response, next: NextFunction) => {
   // const body: { users: string[] } = req.body;
 
@@ -520,4 +561,12 @@ router.post(
     authorizationMiddleware(req, res, next, []),
   rsvpUser
 );
+
+router.post(
+  "/:id/checkin",
+  (req: Request, res: Response, next: NextFunction) =>
+    authorizationMiddleware(req, res, next, []),
+  checkinUser
+);
+
 export default router;
